@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>Cookie Invasion</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+*{box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:#fff;margin:0;overflow-x:hidden}
+::-webkit-scrollbar{display:none}*{-ms-overflow-style:none;scrollbar-width:none}
+.serif{font-family:'DM Serif Display',Georgia,serif}
+@keyframes beamDraw{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+.beam-line{stroke-dasharray:1400;stroke-dashoffset:1400;animation:beamDraw .45s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes cPop{0%{filter:brightness(1)}40%{filter:brightness(2.2)}100%{filter:brightness(1)}}
+.cpop{animation:cPop .5s ease forwards}
+@keyframes fup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fup{animation:fup .5s ease forwards}
+@keyframes hPulse{0%,100%{opacity:.35}50%{opacity:.1}}
+.hpulse{animation:hPulse 1.8s ease-in-out infinite}
+@keyframes sp{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}
+.spark{animation:sp .5s ease forwards}
+@keyframes rrIn{from{opacity:0}to{opacity:1}}
+.rr{animation:rrIn .6s .3s ease forwards;opacity:0}
+@keyframes yIn{from{stroke-dashoffset:500;opacity:0}to{stroke-dashoffset:0;opacity:.85}}
+.yline{stroke-dasharray:500;stroke-dashoffset:500;animation:yIn .7s .15s ease forwards}
+@keyframes bGl{0%,100%{color:#0a84ff;text-shadow:0 0 8px rgba(10,132,255,.4)}50%{color:#5ac8fa;text-shadow:0 0 18px rgba(90,200,250,.7)}}
+.bglow{animation:bGl 1.5s ease-in-out infinite}
+@keyframes liftGlow{0%,100%{filter:drop-shadow(0 0 4px #f97316) drop-shadow(0 0 8px rgba(249,115,22,.5))}50%{filter:drop-shadow(0 0 8px #fdba74) drop-shadow(0 0 16px rgba(253,186,116,.7))}}
+@keyframes agB{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.agbounce{animation:agB 2.2s ease-in-out infinite}
+@keyframes bubIn{from{opacity:0;transform:scale(.85) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.bubin{animation:bubIn .28s ease forwards}
+.canvas-wrap{border-radius:18px;overflow:hidden;box-shadow:0 2px 32px rgba(0,0,0,.07),0 1px 6px rgba(0,0,0,.05);width:100%;max-width:780px}
+.gsvg{cursor:crosshair;user-select:none;-webkit-user-select:none;display:block;width:100%;touch-action:none}
+.gsvg.drag{cursor:grabbing}
+.dbtn{background:#1c1c1e;color:#fff;border:none;border-radius:14px;font-size:18px;font-weight:500;padding:16px 38px;cursor:pointer;transition:transform .12s,background .2s,box-shadow .2s;box-shadow:0 2px 14px rgba(0,0,0,.18);font-family:'DM Sans',sans-serif}
+.dbtn:hover{background:#2c2c2e;transform:translateY(-1px);box-shadow:0 4px 22px rgba(0,0,0,.22)}
+.dbtn:active{transform:scale(.97)}.dbtn:disabled{background:#c7c7cc;box-shadow:none;cursor:default;transform:none}
+.gbtn{background:transparent;color:#636366;border:1.5px solid #d1d1d6;border-radius:10px;font-size:16px;padding:11px 24px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:border-color .15s,color .15s}
+.gbtn:hover{border-color:#8e8e93;color:#1c1c1e}
+.nbtn{background:#0a84ff;color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:500;padding:15px 34px;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 2px 14px rgba(10,132,255,.3);transition:transform .12s,box-shadow .2s}
+.nbtn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(10,132,255,.4)}
+.eqchip{background:#f2f2f7;border-radius:8px;padding:6px 14px;font-size:16px;font-weight:500;color:#1c1c1e;font-variant-numeric:tabular-nums}
+.pill{background:#f2f2f7;border-radius:100px;padding:4px 13px;font-size:12px;color:#636366;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.hcard{background:#f9f9fb;border-radius:12px;padding:14px 18px;font-size:15px;color:#3a3a3c;line-height:1.6;max-width:480px;text-align:center}
+.scard{background:linear-gradient(135deg,#e8faf0,#d4f5e4);border:1.5px solid #a3e6be;border-radius:18px;padding:22px 30px;text-align:center;max-width:480px;width:100%}
+.mcard{background:#fff4f4;border:1.5px solid #ffd2d2;border-radius:14px;padding:16px 22px;text-align:center;max-width:440px}
+.pcard{background:#fffbea;border:1.5px solid #ffe08a;border-radius:14px;padding:16px 22px;text-align:center;max-width:440px}
+.blkcard{background:#fff8ee;border:1.5px solid #ffcc66;border-radius:14px;padding:16px 22px;text-align:center;max-width:440px}
+.mnote{background:#f9f9fb;border-radius:14px;padding:18px 22px;border-left:3px solid #d1d1d6;max-width:540px;width:100%}
+.defcard{background:#f9f9fb;border-radius:16px;padding:24px 28px;border-left:3px solid #0a84ff}
+.wcard{background:#fff;border-radius:16px;padding:24px 28px;border:1.5px solid #e5e5ea}
+.qcard{background:#fff;border-radius:16px;padding:24px 28px;border:1.5px solid #e5e5ea}
+.icard{background:#f0f4ff;border-radius:16px;padding:24px 28px;border:1.5px solid #c7d2fe}
+.cb{background:#f2f2f7;border-radius:8px;padding:12px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:15px;color:#1c1c1e;line-height:1.9}
+.phcard{background:#faf9ff;border-radius:18px;padding:30px 34px;border:1.5px dashed #c7d2fe;max-width:580px;width:100%;text-align:center}
+.mcbtn{border-radius:12px;border:1.5px solid #e5e5ea;background:#fff;padding:12px 20px;font-size:16px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;min-width:82px}
+.mcbtn:hover:not(:disabled){border-color:#0a84ff;background:#f0f7ff}
+.mcbtn.ok{background:#e8faf0;border-color:#34c759;color:#1c5c35}
+.mcbtn.no{background:#fff4f4;border-color:#ff3b30;color:#9b1c1c}
+.mcbtn.dim{background:#f9f9fb;color:#aeaeb2;border-color:#e5e5ea}
+.kco{border:2px solid #e5e5ea;border-radius:16px;background:#fff;padding:18px 14px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;font-family:'DM Sans',sans-serif}
+.kco:hover:not(:disabled){border-color:#0a84ff;background:#f0f7ff;transform:translateY(-2px)}
+.kco.ok{border-color:#34c759;background:#e8faf0}.kco.no{border-color:#ff3b30;background:#fff4f4}.kco.dim{opacity:.45}
+.sec{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:clamp(70px,9vw,90px) clamp(16px,4vw,32px) 80px;border-bottom:1px solid #f2f2f7}
+.secctr{justify-content:center}
+.hud{background:rgba(28,28,30,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:14px;padding:13px 22px;display:flex;align-items:center;gap:14px;border:1px solid rgba(255,255,255,.1)}
+.lifthint{background:#f0f7ff;border:1.5px solid #bae0ff;border-radius:10px;padding:9px 16px;font-size:14px;color:#0a84ff;text-align:center}
+.tgbtn{position:fixed;bottom:18px;right:18px;z-index:200;width:64px;height:85px;border-radius:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s;padding:0}
+.tgbtn:hover{transform:scale(1.08) translateY(-2px)}.tgpop{position:fixed;bottom:110px;right:18px;z-index:200;width:290px;background:#fff;border-radius:20px;box-shadow:0 8px 44px rgba(0,0,0,.14);padding:22px;border:1.5px solid #e5e5ea}
+  @keyframes arrowBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const {useState,useEffect,useRef,useCallback}=React;
+
+  // Coordinate system: m2s(mx,my) -> SVG px. Math-y UP, SVG-y DOWN.
+  const CW=800,CH=440,OX=60,OY=400,CR=17;
+  const m2s=(mx,my)=>({x:OX+mx,y:OY-my});
+
+  function beamEnd(angle,b=0){
+    const cos=Math.cos(angle),sin=Math.sin(angle);
+    const sx=OX,sy=OY-b;
+    let t=1e9;
+    if(cos> .001)t=Math.min(t,(CW-sx)/cos);
+    if(cos<-.001)t=Math.min(t,sx/(-cos));
+    if(sin> .001)t=Math.min(t,sy/sin);
+    if(sin<-.001)t=Math.min(t,(CH-sy)/(-sin));
+    if(!isFinite(t))t=CW;
+    return{x:sx+t*cos,y:sy-t*sin};
+  }
+  function rayHits(angle,mx,my,b=0){
+    const cos=Math.cos(angle),sin=Math.sin(angle);
+    const dy=my-b;
+    if(mx*cos+dy*sin<0)return false;
+    return Math.abs(mx*sin-dy*cos)<=CR;
+  }
+function beamBlocked(angle,b,obs){
+    const tan=Math.tan(angle);
+    const yLeft = tan*obs.mx+b;
+    const yRight = tan*(obs.mx+obs.width)+b;
+    
+    // If the beam is entirely above the obstacle at both edges, it clears it safely
+    if (yLeft > obs.height && yRight > obs.height) return false;
+    // If the beam is entirely below the ground (impossible in our game, but good math practice)
+    if (yLeft < 0 && yRight < 0) return false;
+    
+    // Otherwise, the infinite line intersects the bounding box of the obstacle
+    return true;
+  }
+  
+  function blockedPt(angle,b,obs){
+    const tan=Math.tan(angle);
+    const yLeft=tan*obs.mx+b;
+    // If it hit the front face
+    if(yLeft>=0 && yLeft<=obs.height) return {x:OX+obs.mx, y:OY-yLeft};
+    // If it hit the top face (came from above)
+    if(yLeft > obs.height) return {x:OX + ((obs.height-b)/tan), y:OY-obs.height};
+    // Fallback for back face
+    return {x:OX+obs.mx+obs.width, y:OY-(tan*(obs.mx+obs.width)+b)};
+  }
+
+  // ── Level-1 config ─────────────────────────────────────────────
+  const SEC=[
+    {id:'1.1',pill:'Level 1 \u00b7 Intuition',title:'Cookie Invasion',
+     desc:null,  // rendered custom in GameSec for 1.1
+     cookies:[{id:'A',mx:560,my:225}],trees:[{mx:520,h:220}],riseRun:false,
+     hint:c=>'Cookie is in the tree at ('+c.mx+', '+c.my+'). Maser sits at origin (0, 0). Aim!',
+     okTitle:'Cookie baked!',okBody:s=>'Beam: y = '+s+'x  \u2014  slope m = tan(\u03b8) = '+s+'.',
+     hintAngle:'~22\u00b0',hintAfter:2,maserEgg:true},
+    {id:'1.2',pill:'Level 1 \u00b7 The Ratio',title:'Three Rogue Cookies!',
+     desc:'Three cookies appeared. One beam bakes all three \u2014 if your slope is exactly right.',
+     cookies:[{id:'A',mx:300,my:100},{id:'B',mx:450,my:150},{id:'C',mx:600,my:200}],
+     trees:[{mx:270,h:200},{mx:570,h:240}],riseRun:true,
+     hint:()=>'Cookies at (300,100), (450,150), (600,200). They are collinear \u2014 one line hits all three!',
+     okTitle:'All three baked!',okBody:()=>'Rise \u0394y=50, run \u0394x=150 between each pair \u2192 m = 1/3.',
+     hintAngle:'~18\u00b0',hintAfter:2},
+    {id:'1.2.1',type:'slope-explorer'},
+    {id:'1.3',pill:'Level 1 \u00b7 Zero Slope',title:'Ground-Level Cookie',
+     desc:'This cookie sits on the ground. A horizontal beam has zero vertical rise.',
+     cookies:[{id:'A',mx:500,my:0}],trees:[],riseRun:false,
+     hint:()=>'Cookie at (500, 0). Slope 0 means a perfectly horizontal beam.',
+     okTitle:'Zero slope!',okBody:()=>'Horizontal line: m = 0. \u0394y = 0 \u2192 m = 0 \u00f7 \u0394x = 0.',
+     hintAngle:'~0\u00b0',hintAfter:2},
+    {id:'1.4',pill:'Level 1 \u00b7 Steepness',title:'Sky-High Cookie',
+     desc:"This cookie is very high up. You'll need a steep beam with a large slope.",
+     cookies:[{id:'A',mx:300,my:340}],trees:[{mx:265,h:360}],riseRun:false,
+     hint:()=>'Cookie at (300, 340). How steep must the line be?',
+     okTitle:'Steep slope!',okBody:s=>'m = '+s+'. Steeper lines have larger m.',
+     hintAngle:'~49\u00b0',hintAfter:2},
+    {id:'kc1',type:'kc',pill:'Knowledge Check',
+     q:'Which beam has Zero Slope?',
+     soc:'Zero slope = no rise and no fall. Which beam is completely flat?',
+     opts:[{id:'A',a:0},{id:'B',a:Math.PI/10},{id:'C',a:Math.PI/4},{id:'D',a:Math.PI/3}],cor:'A'},
+    {id:'kc2',type:'kc',pill:'Knowledge Check',
+     q:'Which beam has the Largest Slope?',
+     soc:'Slope = rise / run. Which beam rises most per unit of horizontal travel?',
+     opts:[{id:'A',a:Math.PI/12},{id:'B',a:Math.PI/5},{id:'C',a:Math.PI/4},{id:'D',a:5*Math.PI/12}],cor:'D'},
+    {id:'l2.1',type:'l2sub',subId:'2.1'},
+    {id:'l2.2',type:'l2sub',subId:'2.2'},
+    {id:'l2.3',type:'l2sub',subId:'2.3'},
+    {id:'l2.4',type:'l2sub',subId:'2.4'},
+    {id:'kc.neg',type:'kc',pill:'Knowledge Check',
+     q:'Which beam has a Negative Slope?',
+     soc:'Negative slope: beam tilts downward from left to right. Which one falls as it moves right?',
+     opts:[{id:'A',a:0},{id:'B',a:Math.PI/4},{id:'C',a:-Math.PI/4},{id:'D',a:Math.PI/2*.95}],cor:'C'},
+  ];
+  const ALL=[...SEC,
+    {id:'l3.1',type:'l3sub',subId:'3.1'},
+    {id:'l3.2',type:'l3sub',subId:'3.2'},
+    {id:'l3.3',type:'l3sub',subId:'3.3'},
+    {id:'l3.teach',type:'l3teach'},
+    {id:'l3.4',type:'l3sub',subId:'3.4'},
+    {id:'l3.5',type:'l3sub',subId:'3.5'},
+    {id:'l3.6',type:'l3sub',subId:'3.6'},
+    {id:'l4.final',type:'l4final'},
+    {id:'done',type:'done'}
+  ];
+
+  // ── Level-2 sub-levels (4 steps through y-intercept concept) ──
+  // 2.1: angle locked, pure lift only
+  // 2.2: must use NEGATIVE slope + high lift
+  // 2.3: positive slope + lift combo
+  // 2.4: two cookies, no obstacles
+  const L2S={
+    '2.1':{pill:'Level 2 \u00b7 Y-Intercept',title:'The Scissor Lift',
+      desc:'A cookie hides behind a park bench. The beam angle is locked horizontal. Drag the LEFT side of the canvas UP to raise the maser beam over the bench!',
+      cookies:[{id:'A',mx:500,my:105}],obs:[{mx:150,width:40,height:100}],trees:[{mx:460,h:245}],
+      lock:true,neg:false,b0:0,a0:0,
+      hint:'Angle is locked at 0. Drag the LEFT side of the canvas upward to raise the lift.',hintAfter:1,
+      okT:'Cleared it!',okB:b=>'Lift raised the beam to y = '+Math.round(b)+'. Every point on the beam gained +'+Math.round(b)+' in height!',
+      yReveal:true,agOk:"See that? By lifting the maser you added a constant y-value to the entire beam! That starting height is the y-intercept \u2014 the '+ b' in y = mx + b."},
+    '2.2':{pill:'Level 2 \u00b7 Negative Slope',title:'Tilt it Down!',
+      desc:'A cookie is hiding on the far side of the bench. Lift the maser beam HIGH to clear the bench, then tilt the barrel DOWNWARD so the beam angles back down to the cookie.',
+      cookies:[{id:'A',mx:500,my:15}],obs:[{mx:150,width:40,height:100}],trees:[],
+      lock:false,neg:true,b0:0,a0:Math.PI/8,
+      hint:'Raise the lift above the bench height, then drag the barrel below horizontal for a negative slope.',hintAfter:2,
+      okT:'Negative slope mastered!',okB:(b,m)=>'Beam: y = '+m+'x + '+Math.round(b)+'. Negative slope: beam falls from left to right.',
+      negTeach:true},
+    '2.3':{pill:'Level 2 \u00b7 Aim & Lift',title:'Aim and Lift',
+      desc:'Both controls are unlocked. Combine slope and y-intercept to hit the cookie behind the tall obstacle.',
+      cookies:[{id:'A',mx:600,my:250}],obs:[{mx:300,width:50,height:180}],trees:[],
+      lock:false,neg:true,b0:0,a0:Math.PI/8,
+      hint:'y = m * x + b. You need both the right slope AND enough lift to clear the can.',hintAfter:2,
+      okT:'Direct hit!',okB:(b,m)=>'Beam: y = '+m+'x + '+Math.round(b)+'. Slope sets the angle, b gets you over the obstacle!'},
+    '2.4':{pill:'Level 2 \u00b7 Two Cookies',title:'Two Cookies, One Beam',
+      desc:'No obstacles. Find the exact line y = mx + b that passes through BOTH cookies simultaneously.',
+      cookies:[{id:'A',mx:200,my:200},{id:'B',mx:500,my:350}],obs:[],trees:[{mx:165,h:295},{mx:460,h:370}],
+      lock:false,neg:true,b0:0,a0:Math.PI/8,
+      hint:'Cookies at (200, 200) and (500, 350). Both must lie on the same line.',hintAfter:2,
+      okT:'Both baked!',okB:(b,m)=>'Line: y = '+m+'x + '+Math.round(b)+'. Slope between cookies = (350-200)/(500-200) = 1/2.'},
+  };
+  const L2O=['2.1','2.2','2.3','2.4'];
+
+  // ════════════════════════════ SVG PARTS ════════════════════════
+
+  function ParkScene({trees=[],pfx='p'}){
+    const blds=[
+      {x:90,ty:202,w:56,rows:3,cols:2,wW:12,wH:14,hP:10,vP:12,hG:8,vG:8},
+      {x:210,ty:188,w:50,rows:4,cols:2,wW:10,wH:13,hP:9,vP:11,hG:7,vG:7},
+      {x:664,ty:218,w:82,rows:3,cols:3,wW:13,wH:14,hP:10,vP:11,hG:6,vG:7},
+    ];
+    return(<g>
+      <defs>
+        <linearGradient id={pfx+'sk'} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#eef2ff"/><stop offset="100%" stopColor="#fafaf8"/>
+        </linearGradient>
+        <linearGradient id={pfx+'gr'} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#d4edda"/><stop offset="100%" stopColor="#b8dfc4"/>
+        </linearGradient>
+        {blds.map((b,i)=><clipPath key={i} id={pfx+'c'+i}><rect x={b.x} y={b.ty} width={b.w} height={OY-b.ty}/></clipPath>)}
+      </defs>
+      <rect x="0" y="0" width={CW} height={CH} fill={'url(#'+pfx+'sk)'}/>
+      {blds.map((b,i)=>{
+        const bh=OY-b.ty,wins=[];
+        for(let r=0;r<b.rows;r++)for(let c=0;c<b.cols;c++)
+          wins.push({x:b.x+b.hP+c*(b.wW+b.hG),y:b.ty+b.vP+r*(b.wH+b.vG)});
+        return(<g key={i}>
+          <rect x={b.x} y={b.ty} width={b.w} height={bh} fill="none" stroke="#c8ccd4" strokeWidth="1.2"/>
+          <g clipPath={'url(#'+pfx+'c'+i+')'}>
+            {wins.map((w,j)=><rect key={j} x={w.x} y={w.y} width={b.wW} height={b.wH} fill="none" stroke="#c8ccd4" strokeWidth="0.8"/>)}
+            {i===0&&<line x1={b.x} y1={b.ty+bh*.45} x2={b.x+b.w} y2={b.ty+bh*.45} stroke="#c8ccd4" strokeWidth="0.7"/>}
+          </g>
+        </g>);
+      })}
+      <rect x="0" y={OY} width={CW} height={CH-OY} fill={'url(#'+pfx+'gr)'}/>
+      {[65,110,165,225,295,385,475,565,645,715,765].map((gx,i)=>(
+        <line key={i} x1={gx} y1={OY} x2={gx+4} y2={OY-7} stroke="#a8d5b5" strokeWidth="1.2" strokeLinecap="round"/>
+      ))}
+      <line x1="0" y1={OY} x2={CW} y2={OY} stroke="#8aba97" strokeWidth="1.5"/>
+      {trees.map((t,i)=><TreeSVG key={i} mx={t.mx} h={t.h}/>)}
+    </g>);
+  }
+
+  function TreeSVG({mx,h}){
+    const b=m2s(mx,0),t=m2s(mx,h),cr=Math.min(70,h*.27);
+    return(<g>
+      <line x1={b.x} y1={b.y} x2={t.x} y2={t.y} stroke="#7c5c3a" strokeWidth="6" strokeLinecap="round"/>
+      <line x1={m2s(mx,h*.6).x} y1={m2s(mx,h*.6).y} x2={m2s(mx-42,h*.74).x} y2={m2s(mx-42,h*.74).y} stroke="#7c5c3a" strokeWidth="3.5" strokeLinecap="round"/>
+      <line x1={m2s(mx,h*.7).x} y1={m2s(mx,h*.7).y} x2={m2s(mx+38,h*.82).x} y2={m2s(mx+38,h*.82).y} stroke="#7c5c3a" strokeWidth="3" strokeLinecap="round"/>
+      <circle cx={t.x-22} cy={t.y-10} r={cr*.76} fill="#c8e6c0" stroke="#9dcf9a" strokeWidth="1.2" opacity=".85"/>
+      <circle cx={t.x+20} cy={t.y-14} r={cr*.69} fill="#b8ddb0" stroke="#9dcf9a" strokeWidth="1.2" opacity=".85"/>
+      <circle cx={t.x}    cy={t.y-26} r={cr}      fill="#c4e4bb" stroke="#9dcf9a" strokeWidth="1.2" opacity=".9"/>
+    </g>);
+  }
+
+  function CookieSVG({mx,my,baked,pop,showId,cid}){
+    const{x:cx,y:cy}=m2s(mx,my);
+    const chips=[{dx:-5,dy:-5},{dx:5,dy:-6},{dx:0,dy:4},{dx:-7,dy:3},{dx:7,dy:2},{dx:2,dy:-1}];
+    return(<g transform={'translate('+cx+','+cy+')'}>
+      <ellipse cx="1" cy="16" rx="13" ry="3.5" fill="rgba(0,0,0,0.08)"/>
+      <circle className={pop?'cpop':''} r="14" fill={baked?'#C68642':'#F5DEB3'} stroke="#c4a47a" strokeWidth="1.2"/>
+      <clipPath id={'cc_'+cid}><circle r="11"/></clipPath>
+      <g clipPath={'url(#cc_'+cid+')'}>
+        {chips.map((c,i)=><ellipse key={i} cx={c.dx} cy={c.dy} rx="2.4" ry="1.9" fill="#3d2200" opacity=".88" transform={'rotate('+(i*30)+')'}/>)}
+      </g>
+      <circle cx="-4" cy="-5" r="3.5" fill="white" opacity=".18"/>
+      {showId&&<text y="28" textAnchor="middle" fontSize="9" fill="#8e8e93" fontFamily="monospace">{cid.slice(-1)}</text>}
+    </g>);
+  }
+
+  function MaserSVG({angle,dragging,b=0}){
+    const{x:bx,y:by}=m2s(0,b);
+    const ex=bx+Math.cos(angle)*32,ey=by-Math.sin(angle)*32;
+    // Drag handle sits far out along the beam — well away from the scissor lift zone
+    const hx=bx+Math.cos(angle)*130,hy=by-Math.sin(angle)*130;
+    return(<g>
+      <rect x={bx-14} y={by-12} width="28" height="24" rx="5" fill="#1c1c1e" stroke="#48484a" strokeWidth="1.2"/>
+      {[-4,0,4].map((v,i)=><line key={i} x1={bx-9} y1={by+v} x2={bx-3} y2={by+v} stroke="#636366" strokeWidth="1"/>)}
+      <circle cx={bx+10} cy={by} r="6" fill="#0a84ff" opacity=".22" stroke="#0a84ff" strokeWidth="1.5"/>
+      <circle cx={bx+10} cy={by} r="3" fill="#0a84ff" opacity=".78"/>
+      <line x1={bx+10} y1={by} x2={ex} y2={ey} stroke="#636366" strokeWidth="4.5" strokeLinecap="round"/>
+      <circle cx={ex} cy={ey} r="3.5" fill="#0a84ff" opacity=".88"/>
+      {/* Pulsing halo hint — pointer-events none so it doesn't intercept clicks */}
+      {!dragging&&<circle className="hpulse" cx={hx} cy={hy} r="20" fill="#0a84ff" style={{pointerEvents:'none'}}/>}
+      <circle cx={hx} cy={hy} r="6" fill="#0a84ff" opacity=".9"/>
+      <line x1={hx-5} y1={hy} x2={hx+5} y2={hy} stroke="white" strokeWidth="1.5" opacity=".8"/>
+      <line x1={hx}   y1={hy-5} x2={hx}   y2={hy+5} stroke="white" strokeWidth="1.5" opacity=".8"/>
+      <text x={bx-8} y={by+28} fontSize="9" fill="#aeaeb2" fontFamily="monospace">{b>0?'(0,'+Math.round(b)+')':'(0,0)'}</text>
+    </g>);
+  }
+
+  function RiseRun(){
+    const A=m2s(300,100),K=m2s(450,100),B=m2s(450,150);
+    return(<g className="rr" style={{pointerEvents:'none'}}>
+      <line x1={A.x} y1={A.y} x2={K.x} y2={K.y} stroke="#0a84ff" strokeWidth="1.8" strokeDasharray="5 4" opacity=".8"/>
+      <line x1={K.x} y1={K.y} x2={B.x} y2={B.y} stroke="#34c759" strokeWidth="1.8" strokeDasharray="5 4" opacity=".8"/>
+      <text x={(A.x+K.x)/2} y={A.y+15} textAnchor="middle" fontSize="10" fill="#0a84ff" fontFamily="monospace" fontWeight="600">run=150</text>
+      <text x={K.x+8} y={(K.y+B.y)/2+4} fontSize="10" fill="#34c759" fontFamily="monospace" fontWeight="600">rise=50</text>
+      <circle cx={K.x} cy={K.y} r="3" fill="#aeaeb2" opacity=".7"/>
+    </g>);
+  }
+
+  function Spark({mx,my}){
+    const{x:cx,y:cy}=m2s(mx,my);
+    return(<g className="spark" style={{pointerEvents:'none'}}>
+      {Array.from({length:8},(_,i)=>{
+        const a=i/8*2*Math.PI;
+        return<line key={i} x1={cx+Math.cos(a)*10} y1={cy+Math.sin(a)*10} x2={cx+Math.cos(a)*22} y2={cy+Math.sin(a)*22} stroke="#ff9f0a" strokeWidth="2.2" strokeLinecap="round" opacity=".9"/>;
+      })}
+    </g>);
+  }
+
+  function Grid(){
+    const els=[];
+    for(let mx=0;mx<=740;mx+=100){
+      const s=m2s(mx,0);
+      els.push(<line key={'v'+mx} x1={s.x} y1={0} x2={s.x} y2={CH} stroke="#dde" strokeWidth=".5" strokeDasharray="3 5"/>);
+      if(mx>0)els.push(<text key={'vl'+mx} x={s.x} y={OY-5} fontSize="8" fill="#c4c4d4" textAnchor="middle" fontFamily="monospace">{mx}</text>);
+    }
+    for(let my=0;my<=380;my+=100){
+      const s=m2s(0,my);
+      els.push(<line key={'h'+my} x1={0} y1={s.y} x2={CW} y2={s.y} stroke="#dde" strokeWidth=".5" strokeDasharray="3 5"/>);
+      if(my>0)els.push(<text key={'hl'+my} x={12} y={s.y-3} fontSize="8" fill="#c4c4d4" fontFamily="monospace">{my}</text>);
+    }
+    return<g opacity=".7" style={{pointerEvents:'none'}}>{els}</g>;
+  }
+
+  function ParkBench({mx,width,height,blocked}){
+    const{x:bx,y:by}=m2s(mx,0);
+    const tY=by-height,cw=width;
+    // Bench proportions: seat at ~60% up, backrest above that
+    const seatY=tY+height*.42;   // seat top in SVG coords
+    const legH=by-seatY;         // leg height
+    const legW=6,seatH=8,backH=height*.38,backW=5;
+    return(<g>
+      {/* legs — two pairs */}
+      <rect x={bx+8}      y={seatY} width={legW} height={legH} rx="2" fill="#8B6914" stroke="#5a3e0a" strokeWidth="1.2"/>
+      <rect x={bx+cw-14}  y={seatY} width={legW} height={legH} rx="2" fill="#8B6914" stroke="#5a3e0a" strokeWidth="1.2"/>
+      {/* seat planks */}
+      {[0,5,10].map((off,i)=>(
+        <rect key={i} x={bx+2} y={seatY-seatH+off*.5} width={cw-4} height={4} rx="1.5"
+              fill={i===1?'#a0722a':'#c8922a'} stroke="#7a5010" strokeWidth=".8"/>
+      ))}
+      {/* backrest posts */}
+      <rect x={bx+10}     y={tY}        width={backW} height={backH} rx="2" fill="#8B6914" stroke="#5a3e0a" strokeWidth="1.2"/>
+      <rect x={bx+cw-15}  y={tY}        width={backW} height={backH} rx="2" fill="#8B6914" stroke="#5a3e0a" strokeWidth="1.2"/>
+      {/* backrest planks */}
+      {[0,7].map((off,i)=>(
+        <rect key={i} x={bx+6} y={tY+off} width={cw-12} height={5} rx="1.5"
+              fill="#c8922a" stroke="#7a5010" strokeWidth=".8"/>
+      ))}
+      {/* blocked flash */}
+      {blocked&&<g className="spark">
+        <circle cx={bx+cw+18} cy={tY-12} r="16" fill="#fef08a" stroke="#eab308" strokeWidth="2" opacity=".95"/>
+        <text x={bx+cw+18} y={tY-7} textAnchor="middle" fontSize="14" fontWeight="bold" fill="#92400e">!</text>
+      </g>}
+    </g>);
+  }
+
+  function ScissorLift({b,ld}){
+    // Always visible. 6 scissor diamonds stacked vertically.
+    // At b=0 they are squished flat; as b grows they expand to show the classic X pattern.
+    const N=6; // total scissors
+    const{x:bx,y:by}=m2s(0,0);
+    // Lift geometry
+    const liftW=28;          // half-width of each X
+    const lx=bx-liftW/2;    // left rail x
+    const rx=bx+liftW/2;    // right rail x
+    const baseY=by;          // bottom of lift (ground)
+    const topY=OY-b;         // top of platform
+    const totalH=baseY-topY; // total lift height (0 when b=0)
+    const diamH=Math.max(2,totalH/N); // height of each diamond (min 2 so always visible)
+    const COL='#f97316';     // orange
+    const COL2='#ea580c';    // darker orange for rails
+    return(<g>
+      {/* Left and right vertical rails */}
+      <line x1={lx} y1={baseY} x2={lx} y2={topY} stroke={COL2} strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1={rx} y1={baseY} x2={rx} y2={topY} stroke={COL2} strokeWidth="2.5" strokeLinecap="round"/>
+      {/* 6 scissor X diamonds */}
+      {Array.from({length:N},(_,i)=>{
+        const y0=baseY-i*diamH;     // bottom of this diamond
+        const y1=baseY-(i+1)*diamH; // top of this diamond
+        const mid=(y0+y1)/2;
+        return(<g key={i}>
+          {/* Left diagonal: lx,y0 → rx,y1 */}
+          <line x1={lx} y1={y0} x2={rx} y2={y1} stroke={COL} strokeWidth="2.5" strokeLinecap="round"/>
+          {/* Right diagonal: rx,y0 → lx,y1 */}
+          <line x1={rx} y1={y0} x2={lx} y2={y1} stroke={COL} strokeWidth="2.5" strokeLinecap="round"/>
+          {/* Center pivot dot */}
+          <circle cx={bx} cy={mid} r="3" fill={COL2}/>
+        </g>);
+      })}
+      {/* Base plate */}
+      <rect x={lx-6} y={baseY-4} width={liftW+12} height={8} rx="3" fill={COL2}/>
+      {/* Top platform */}
+      <rect x={lx-8} y={topY-5} width={liftW+16} height={8} rx="3" fill={COL2}/>
+      {/* b= label */}
+      <text x={lx-8} y={topY+4} textAnchor="end" fontSize="9" fill="#f97316" fontFamily="monospace" fontWeight="600">{'b='+Math.round(b)}</text>
+      {/* Glowing drag handle on the platform */}
+      <g style={{animation:'liftGlow 1.6s ease-in-out infinite',cursor:'grab'}}>
+        <rect x={lx+2} y={topY-19} width={liftW+4} height={22} rx="8"
+              fill={ld?'rgba(249,115,22,.55)':'rgba(249,115,22,.28)'}
+              stroke={COL} strokeWidth={ld?2.5:2}/>
+        {[-4,0,4].map((v,i)=>(
+          <line key={i} x1={lx+6} y1={topY-8+v} x2={rx+2} y2={topY-8+v}
+                stroke={ld?'#fff':'#fdba74'} strokeWidth="1.8" strokeLinecap="round" opacity=".9"/>
+        ))}
+        <text x={rx+8} y={topY-4} fontSize="11" fill="#fdba74" fontWeight="700" opacity=".85">&#x2195;</text>
+      </g>
+    </g>);
+  }
+
+  // Math tutor character SVG (internal asset)
+  function Agent({msg,setMsg,onAsk}){
+    const showBubble=!!msg;
+    return(<div style={{position:'absolute',bottom:16,right:16,display:'flex',flexDirection:'column',alignItems:'flex-end',zIndex:10}}>
+      {msg&&<div className="bubin" style={{background:'#fff',borderRadius:'16px 16px 0 16px',border:'1.5px solid #e5e5ea',padding:'12px 16px',maxWidth:240,marginBottom:8,boxShadow:'0 4px 18px rgba(0,0,0,.1)',fontSize:14,lineHeight:1.55,color:'#3a3a3c',position:'relative'}}>
+        {msg}
+        <button onClick={()=>setMsg('')} style={{position:'absolute',top:6,right:8,background:'none',border:'none',cursor:'pointer',fontSize:14,color:'#aeaeb2',lineHeight:1}}>&#x00D7;</button>
+      </div>}
+      <div className="agbounce" style={{cursor:'pointer',filter:'drop-shadow(0 4px 12px rgba(0,0,0,.18))'}}
+           onClick={()=>msg?setMsg(''):onAsk()}>
+        <svg viewBox="0 0 150 200" xmlns="http://www.w3.org/2000/svg" width="100" height="133">
+          {showBubble&&<g id="chat-bubble" transform="translate(10, 0)">
+            <path d="M 60 10 H 130 A 10 10 0 0 1 140 20 V 50 A 10 10 0 0 1 130 60 H 100 L 80 80 V 60 H 60 A 10 10 0 0 1 50 50 V 20 A 10 10 0 0 1 60 10 Z" fill="#4B0082"/>
+            <circle cx="85" cy="35" r="4" fill="white"/>
+            <circle cx="100" cy="35" r="4" fill="white"/>
+            <circle cx="115" cy="35" r="4" fill="white"/>
+          </g>}
+          <g id="creature-body" transform="translate(0, 90)">
+            <ellipse cx="75" cy="70" rx="68" ry="48" fill="#5F9EA0" fillOpacity="0.2"/>
+            <ellipse cx="75" cy="70" rx="60" ry="50" fill="#5F9EA0"/>
+            <ellipse cx="35" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(-10 35 15)"/>
+            <ellipse cx="115" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(10 115 15)"/>
+            <ellipse cx="75" cy="80" rx="45" ry="38" fill="white"/>
+            <ellipse cx="10" cy="70" rx="6" ry="15" fill="#5F9EA0" transform="rotate(-15 10 70)"/>
+            <ellipse cx="140" cy="70" rx="6" ry="15" fill="#5F9EA0" transform="rotate(15 140 70)"/>
+            <g transform="translate(0, 25)">
+              <circle cx="50" cy="15" r="7" fill="black"/>
+              <circle cx="100" cy="15" r="7" fill="black"/>
+              <circle cx="51" cy="12" r="2.5" fill="white"/>
+              <circle cx="101" cy="12" r="2.5" fill="white"/>
+              <polygon points="75,20 70,14 80,14" fill="#2F4F4F"/>
+              <line x1="25" y1="20" x2="40" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/>
+              <line x1="25" y1="28" x2="40" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/>
+              <line x1="125" y1="20" x2="110" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/>
+              <line x1="125" y1="28" x2="110" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      {!msg&&<div style={{fontSize:9,color:'#aeaeb2',textAlign:'center',marginTop:2}}>Need a hint?</div>}
+    </div>);
+  }
+
+  // In JSX text we now use plain characters or template literals.
+  function L2Hud({angle,b}){
+    const br=Math.round(b);
+    const vert=Math.abs(Math.abs(angle)-Math.PI/2)<.02;
+    const m=vert?'∞':Math.tan(angle).toFixed(2);
+    const babs=Math.abs(br);
+    const bpart=br===0?'':(br>0?' + '+br:' \u2212 '+babs);
+    return(<div className="hud">
+      <span style={{fontSize:13,color:'rgba(255,255,255,.5)',fontWeight:500}}>Beam:</span>
+      <span style={{fontSize:17,fontFamily:'Georgia,serif',color:'#fff',letterSpacing:'-.01em'}}>
+        {vert?'x = 0':<>{'y = '}<span style={{color:'rgba(255,255,255,.9)'}}>{m}</span>{'x'}{br!==0&&<span className="bglow" style={{marginLeft:2}}>{bpart}</span>}</>}
+      </span>
+      <span style={{fontSize:13,color:'rgba(255,255,255,.4)'}}>{'\u03b8='+(angle*180/Math.PI).toFixed(1)+'\u00b0'}</span>
+      {angle<-.05&&<span style={{background:'rgba(255,59,48,.2)',borderRadius:6,padding:'2px 8px',fontSize:13,color:'#ff6b60',fontWeight:500}}>neg slope</span>}
+    </div>);
+  }
+
+  // ════════════════════════ LEVEL-1 CANVAS ═══════════════════════
+  function Canvas1({angle,onAngle,fired,baked,hits,cookies,trees,riseRun}){
+    const svgRef=useRef(null),drag=useRef(false);
+    const[dragging,setDragging]=useState(false);
+    const allHit=hits.size>0&&hits.size===cookies.length;
+    const ca=useCallback((cx,cy)=>{
+      const svg=svgRef.current;if(!svg)return null;
+      const r=svg.getBoundingClientRect();
+      const sx=(cx-r.left)*(CW/r.width),sy=(cy-r.top)*(CH/r.height);
+      const dx=sx-OX,dy=-(sy-OY);
+      if(dx<-10&&Math.abs(dy)<20)return null;
+      return Math.max(0,Math.min(Math.PI/2*.999,Math.atan2(dy,Math.max(dx,0))));
+    },[]);
+    const mv=useCallback(e=>{
+      if(!drag.current)return;e.preventDefault();
+      const p=e.touches?e.touches[0]:e,a=ca(p.clientX,p.clientY);if(a!=null)onAngle(a);
+    },[ca,onAngle]);
+    const up=useCallback(()=>{drag.current=false;setDragging(false);},[]);
+    useEffect(()=>{
+      window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
+      window.addEventListener('touchmove',mv,{passive:false});window.addEventListener('touchend',up);
+      return()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);window.removeEventListener('touchmove',mv);window.removeEventListener('touchend',up);};
+    },[mv,up]);
+    const dn=useCallback(e=>{
+      const p=e.touches?e.touches[0]:e,a=ca(p.clientX,p.clientY);
+      if(a!=null){e.preventDefault();onAngle(a);drag.current=true;setDragging(true);}
+    },[ca,onAngle]);
+    const s=m2s(0,0),ep=beamEnd(angle,0);
+    return(<div className="canvas-wrap">
+      <svg ref={svgRef} viewBox={'0 0 '+CW+' '+CH} className={'gsvg'+(dragging?' drag':'')}
+           style={{maxHeight:450}} onMouseDown={dn} onTouchStart={dn}>
+        <ParkScene trees={trees} pfx="l1"/>
+        <Grid/>
+        <line x1={s.x} y1={s.y} x2={ep.x} y2={ep.y} stroke="#0a84ff" strokeWidth="1.5" strokeDasharray="5 7" opacity=".55" style={{pointerEvents:'none'}}/>
+        <MaserSVG angle={angle} dragging={dragging}/>
+        {fired&&<line className="beam-line" x1={s.x} y1={s.y} x2={ep.x} y2={ep.y} stroke="#0a84ff" strokeWidth="2.5" strokeLinecap="round" style={{pointerEvents:'none'}}/>}
+        {cookies.map(c=><CookieSVG key={c.id} mx={c.mx} my={c.my} baked={baked.has(c.id)} pop={hits.has(c.id)} showId={cookies.length>1} cid={'l1'+c.id}/>)}
+        {riseRun&&allHit&&<RiseRun/>}
+        {fired&&[...hits].map(id=>{const c=cookies.find(x=>x.id===id);return c?<Spark key={id} mx={c.mx} my={c.my}/>:null;})}
+      </svg>
+    </div>);
+  }
+
+  // ════════════════════════ LEVEL-2 CANVAS ═══════════════════════
+  function Canvas2({angle,onAngle,b,onB,fired,baked,hits,cookies,obs,trees,showY,blocked,blkPt,lockAngle,allowNeg}){
+    const svgRef=useRef(null),mode=useRef(null),bRef=useRef(b);
+    useEffect(()=>{bRef.current=b;},[b]);
+    const[da,setDa]=useState(false),[dl,setDl]=useState(false);
+    const gp=useCallback((cx,cy)=>{
+      const svg=svgRef.current;if(!svg)return null;
+      const r=svg.getBoundingClientRect();
+      return{sx:(cx-r.left)*(CW/r.width),sy:(cy-r.top)*(CH/r.height)};
+    },[]);
+    const dn=useCallback(e=>{
+      const p=e.touches?e.touches[0]:e,v=gp(p.clientX,p.clientY);if(!v)return;
+      e.preventDefault();
+      if(v.sx<OX+35){mode.current='lift';setDl(true);}
+      else if(!lockAngle){
+        mode.current='angle';setDa(true);
+        const msy=OY-bRef.current,dx=v.sx-OX,dy=-(v.sy-msy);
+        if(dx>=-5){
+          const raw=Math.atan2(dy,Math.max(dx,.001));
+          onAngle(allowNeg?Math.max(-Math.PI/2*.98,Math.min(Math.PI/2*.98,raw)):Math.max(0,Math.min(Math.PI/2*.98,raw)));
+        }
+      }
+    },[gp,lockAngle,allowNeg,onAngle]);
+    const mv=useCallback(e=>{
+      if(!mode.current)return;e.preventDefault();
+      const p=e.touches?e.touches[0]:e,v=gp(p.clientX,p.clientY);if(!v)return;
+      if(mode.current==='lift'){onB(Math.max(0,Math.min(300,OY-v.sy)));}
+      else{
+        const msy=OY-bRef.current,dx=v.sx-OX,dy=-(v.sy-msy);
+        if(dx>=-5){
+          const raw=Math.atan2(dy,Math.max(dx,.001));
+          onAngle(allowNeg?Math.max(-Math.PI/2*.98,Math.min(Math.PI/2*.98,raw)):Math.max(0,Math.min(Math.PI/2*.98,raw)));
+        }
+      }
+    },[gp,allowNeg,onAngle,onB]);
+    const up=useCallback(()=>{mode.current=null;setDa(false);setDl(false);},[]);
+    useEffect(()=>{
+      window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
+      window.addEventListener('touchmove',mv,{passive:false});window.addEventListener('touchend',up);
+      return()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);window.removeEventListener('touchmove',mv);window.removeEventListener('touchend',up);};
+    },[mv,up]);
+    const orig=m2s(0,b),ep=beamEnd(angle,b),fe=blocked&&blkPt?blkPt:ep;
+    return(<div className="canvas-wrap">
+      <svg ref={svgRef} viewBox={'0 0 '+CW+' '+CH} className={'gsvg'+(da?' drag':'')}
+           style={{maxHeight:450}} onMouseDown={dn} onTouchStart={dn}>
+        <ParkScene trees={trees} pfx="l2"/>
+        <Grid/>
+        {showY&&b>0&&<line className="yline" x1={OX} y1={OY} x2={OX} y2={OY-b} stroke="#0a84ff" strokeWidth="5" strokeLinecap="round"/>}
+        {b>1&&<text x={OX+8} y={OY-b-6} fontSize="10" fill="#0a84ff" fontFamily="monospace" fontWeight="600">{'b='+Math.round(b)}</text>}
+        {obs.map((o,i)=><ParkBench key={i} {...o} blocked={blocked}/>)}
+        <ScissorLift b={b} ld={dl}/>
+        <line x1={orig.x} y1={orig.y} x2={ep.x} y2={ep.y} stroke="#0a84ff" strokeWidth="1.5" strokeDasharray="5 7" opacity=".55" style={{pointerEvents:'none'}}/>
+        <MaserSVG angle={angle} dragging={da} b={b}/>
+        {fired&&<line className="beam-line" x1={orig.x} y1={orig.y} x2={fe.x} y2={fe.y}
+                      stroke={blocked?'#ff9f0a':'#0a84ff'} strokeWidth="2.5" strokeLinecap="round" style={{pointerEvents:'none'}}/>}
+        {cookies.map(c=><CookieSVG key={c.id} mx={c.mx} my={c.my} baked={baked.has(c.id)} pop={hits.has(c.id)} showId={cookies.length>1} cid={'l2'+c.id}/>)}
+        {fired&&!blocked&&[...hits].map(id=>{const c=cookies.find(x=>x.id===id);return c?<Spark key={id} mx={c.mx} my={c.my}/>:null;})}
+      </svg>
+    </div>);
+  }
+
+  // ════════════════════════ SECTIONS ═════════════════════════════
+
+  // ── Angle/Slope keypad: accepts m (slope) or θ (degrees) ───────
+  // onAngle receives the new angle in radians
+  function AngleKeypad({angle,onAngle,allowNeg,disabled,label}){
+    const[raw,setRaw]=useState('');
+    const[mode,setMode]=useState('m'); // 'm' or 'deg'
+    const[err,setErr]=useState('');
+    const vert=Math.abs(angle-Math.PI/2)<.02;
+    const mDisp=vert?'∞':Math.tan(angle).toFixed(3);
+    const degDisp=(angle*180/Math.PI).toFixed(1);
+
+    const commit=()=>{
+      const t=raw.trim();
+      if(!t){setErr('Enter a value');return;}
+      let val;
+      // support fractions like 1/3
+      if(t.includes('/')){const[n,d]=t.split('/');val=parseFloat(n)/parseFloat(d);}
+      else val=parseFloat(t);
+      if(isNaN(val)){setErr('Not a valid number');return;}
+      let a;
+      if(mode==='m'){
+        if(Math.abs(val)>50){setErr('|m| must be ≤ 50');return;}
+        a=Math.atan(val);
+      } else {
+        if(Math.abs(val)>=90){setErr('θ must be between −89° and 89°');return;}
+        a=val*Math.PI/180;
+      }
+      if(!allowNeg&&a<0){setErr('Negative slope not allowed here');return;}
+      setErr('');setRaw('');
+      onAngle(a);
+    };
+
+    return(<div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8,padding:'14px 18px',
+                        background:'#f9f9fb',borderRadius:14,border:'1.5px solid #e5e5ea',minWidth:260}}>
+      {label&&<div style={{fontSize:12,fontWeight:600,color:'#8e8e93',letterSpacing:'.07em',marginBottom:2}}>{label}</div>}
+      <div style={{display:'flex',gap:6,marginBottom:4}}>
+        {[['m','Slope m'],['deg','Angle θ°']].map(([k,lbl])=>(
+          <button key={k} onClick={()=>{setMode(k);setErr('');setRaw('');}}
+                  style={{padding:'5px 14px',borderRadius:20,border:'1.5px solid',fontSize:13,fontWeight:600,cursor:'pointer',
+                          borderColor:mode===k?'#0a84ff':'#d1d1d6',
+                          background:mode===k?'#0a84ff':'#fff',
+                          color:mode===k?'#fff':'#636366'}}>
+            {lbl}
+          </button>
+        ))}
+      </div>
+      <div style={{display:'flex',gap:8,alignItems:'center'}}>
+        <input value={raw} onChange={e=>{setRaw(e.target.value);setErr('');}}
+               onKeyDown={e=>e.key==='Enter'&&commit()}
+               disabled={disabled}
+               placeholder={mode==='m'?'e.g. 1/3 or 0.5':'e.g. 27.5'}
+               style={{width:140,border:'1.5px solid '+(err?'#ff3b30':'#d1d1d6'),borderRadius:10,
+                       padding:'10px 13px',fontSize:16,fontFamily:'monospace',outline:'none',
+                       background:disabled?'#f2f2f7':'#fff',color:'#1c1c1e'}}/>
+        <button onClick={commit} disabled={disabled}
+                style={{padding:'10px 18px',borderRadius:10,background:'#0a84ff',color:'#fff',
+                        border:'none',fontSize:15,fontWeight:600,cursor:disabled?'default':'pointer',
+                        opacity:disabled?.5:1}}>
+          Set
+        </button>
+      </div>
+      {err&&<p style={{fontSize:13,color:'#ff3b30',margin:0}}>{err}</p>}
+      <div style={{fontSize:13,color:'#aeaeb2',marginTop:2}}>
+        Current: m = {mDisp} · θ = {degDisp}°
+      </div>
+    </div>);
+  }
+
+  function EqBar({angle}){
+    const vert=Math.abs(angle-Math.PI/2)<.02;
+    const m=vert?'∞':Math.tan(angle).toFixed(2);
+    return(<div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',justifyContent:'center'}}>
+      <span style={{fontSize:14,color:'#8e8e93',fontWeight:500}}>Trajectory:</span>
+      <span className="eqchip">{vert?'x = 0':'y = '+m+'x'}</span>
+      <span style={{fontSize:14,color:'#aeaeb2'}}>{'θ = '+(angle*180/Math.PI).toFixed(1)+'°'}</span>
+      <span style={{fontSize:14,color:'#aeaeb2'}}>{'m = '+m}</span>
+    </div>);
+  }
+
+  function GameSec({sec,sRef,onDone,setLog}){
+    const[angle,setAngle]=useState(Math.PI/8);
+    const[fired,setFired]=useState(false);
+    const[baked,setBaked]=useState(new Set());
+    const[hits,setHits]=useState(new Set());
+    const[att,setAtt]=useState(0);
+    const[ok,setOk]=useState(false);
+    const[rr,setRr]=useState(false);
+    const[agMsg,setAgMsg]=useState('');
+    const done=useRef(false);
+    const vert=Math.abs(angle-Math.PI/2)<.02,slope=vert?'∞':Math.tan(angle).toFixed(2);
+    const miss=fired&&hits.size===0,partial=fired&&hits.size>0&&hits.size<sec.cookies.length;
+    const onAngle=useCallback(a=>{
+      if(ok&&done.current)return;
+      setAngle(a);
+      if(fired){setFired(false);setHits(new Set());}
+    },[fired,ok]);
+    const deploy=()=>{
+      const h=new Set();
+      sec.cookies.forEach(c=>{if(rayHits(angle,c.mx,c.my,0))h.add(c.id);});
+      const n=att+1;setAtt(n);setFired(true);setHits(h);
+      setBaked(p=>{const s=new Set(p);h.forEach(id=>s.add(id));return s;});
+      setLog(p=>({...p,answersLog:[...p.answersLog,{sec:sec.id,att:n,hit:h.size===sec.cookies.length}]}));
+      if(h.size===sec.cookies.length){
+        setTimeout(()=>setRr(true),250);setTimeout(()=>setOk(true),550);
+        if(!done.current){done.current=true;onDone();}
+      }
+    };
+    const reset=()=>{setFired(false);setHits(new Set());if(!done.current)setOk(false);};
+    const handleAskTotoro=()=>{
+      setAgMsg(att===0?'Aim the maser and fire! I\'ll help if you miss.':sec.hint?'Hint: '+sec.hintAngle:'Keep experimenting!');
+    };
+    const[maserOpen,setMaserOpen]=useState(false);
+    const[eggShown,setEggShown]=useState(false);
+    useEffect(()=>{if(ok&&sec.maserEgg&&!eggShown)setEggShown(true);},[ok,sec.maserEgg,eggShown]);
+    const Intro11=()=>(<p style={{color:'#636366',fontSize:15,lineHeight:1.6,margin:'0 auto',maxWidth:460}}>
+      An invasion of unbaked chocolate chip cookies has descended on the park. Your goal: bake them using your{' '}
+      <span style={{color:'#0a84ff',cursor:'pointer',textDecoration:'underline',textDecorationStyle:'dotted'}}
+            onClick={()=>setMaserOpen(o=>!o)}>microwave laser (maser)</span>
+      {' '}so they can become delicious treats. Click and drag the maser nozzle to aim, then deploy with the button below!
+      {maserOpen&&<span className="fup" style={{display:'block',marginTop:10,padding:'10px 14px',background:'#f0f4ff',borderRadius:10,border:'1.5px solid #c7d2fe',fontSize:15,color:'#3a3a3c',lineHeight:1.6}}>
+        <strong>Maser history:</strong> In 1953, Charles Townes at Columbia University built the first maser (Microwave Amplification by Stimulated Emission of Radiation). It uses quantum mechanics to amplify microwaves &mdash; the same principle later extended to visible light as the <em>laser</em>. Townes won the Nobel Prize in Physics in 1964. Today masers are used in atomic clocks, deep-space communication, and radio astronomy.{' '}
+        <span style={{color:'#0a84ff',cursor:'pointer'}} onClick={e=>{e.stopPropagation();setMaserOpen(false);}}>Close</span>
+      </span>}
+    </p>);
+    return(<div ref={sRef} className="sec">
+      <div style={{textAlign:'center',marginBottom:24,width:'100%',maxWidth:700}}>
+        <div className="pill" style={{display:'inline-block',marginBottom:12}}>{sec.pill}</div>
+        <h2 className="serif" style={{fontSize:'clamp(24px,4.5vw,42px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 10px',letterSpacing:'-.02em',lineHeight:1.15}}>{sec.title}</h2>
+        {sec.id==='1.1'?<Intro11/>:<p style={{color:'#636366',fontSize:15,lineHeight:1.6,margin:'0 auto',maxWidth:440}}>{sec.desc}</p>}
+      </div>
+      <Canvas1 angle={angle} onAngle={onAngle} fired={fired} baked={baked} hits={hits} cookies={sec.cookies} trees={sec.trees} riseRun={sec.riseRun&&rr}/>
+      <div style={{marginTop:8,fontSize:14,color:'#c7c7cc',display:'flex',gap:5}}><span>👆</span><span>Drag canvas to aim</span></div>
+      <div style={{marginTop:12}}><EqBar angle={angle}/></div>
+      {!fired&&!ok&&<div className="hcard" style={{marginTop:14}}>&#x1F4A1; {sec.hint(sec.cookies[0])}</div>}
+      {miss&&<div className="mcard fup" style={{marginTop:14}}><div style={{fontSize:20,marginBottom:5}}>&#x1F3AF; Miss</div><div style={{color:'#636366',fontSize:15,lineHeight:1.5}}>Adjust aim and try again.{att>=sec.hintAfter&&<span style={{color:'#8e8e93'}}>{' Hint: aim for about '+sec.hintAngle+'.'}</span>}</div></div>}
+      {partial&&<div className="pcard fup" style={{marginTop:14}}><div style={{fontSize:20,marginBottom:5}}>&#x1F3AF; Partial ({hits.size}/{sec.cookies.length})</div><div style={{color:'#636366',fontSize:15}}>They&apos;re collinear — one line must pass through all three!</div></div>}
+      {ok&&<div className="scard fup" style={{marginTop:14}}><div style={{fontSize:26,marginBottom:6}}>&#x1F36A;&#x2728;</div><div style={{fontWeight:600,fontSize:16,color:'#1c5c35',marginBottom:6}}>{sec.okTitle}</div><div style={{color:'#2d7a4b',fontSize:15,lineHeight:1.6}}>{sec.okBody(slope)}</div></div>}
+      {ok&&eggShown&&<div className="fup" style={{marginTop:14,display:'flex',gap:14,alignItems:'flex-start',maxWidth:480,background:'#f9f9fb',borderRadius:16,padding:'16px 18px',border:'1.5px solid #e5e5ea'}}>
+        <svg viewBox="0 0 150 200" width="52" height="69" style={{flexShrink:0}}>
+          <g transform="translate(0,90)"><ellipse cx="75" cy="70" rx="60" ry="50" fill="#5F9EA0"/><ellipse cx="35" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(-10 35 15)"/><ellipse cx="115" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(10 115 15)"/><ellipse cx="75" cy="80" rx="45" ry="38" fill="white"/><g transform="translate(0,25)"><circle cx="50" cy="15" r="7" fill="black"/><circle cx="100" cy="15" r="7" fill="black"/><circle cx="51" cy="12" r="2.5" fill="white"/><circle cx="101" cy="12" r="2.5" fill="white"/><polygon points="75,20 70,14 80,14" fill="#2F4F4F"/><line x1="25" y1="20" x2="40" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/><line x1="25" y1="28" x2="40" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/><line x1="125" y1="20" x2="110" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/><line x1="125" y1="28" x2="110" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/></g></g>
+        </svg>
+        <div style={{fontSize:15,color:'#3a3a3c',lineHeight:1.65}}>
+          <strong style={{display:'block',marginBottom:4,color:'#1c1c1e'}}>Psst &mdash; science confession! &#x1F9EA;</strong>
+          A real maser is microwaves, not heat &mdash; it would <em>melt</em> the chocolate but never caramelize the dough! The golden-brown color needs the Maillard reaction from dry heat. But caramelizing looks way cooler for a game. &#x1F36A;
+          <span style={{display:'block',marginTop:8,color:'#636366',fontSize:14}}>That&apos;s your math tutor in the bottom-right corner &mdash; click any time for hints!</span>
+        </div>
+      </div>}
+      <div style={{display:'flex',gap:12,marginTop:20,flexWrap:'wrap',justifyContent:'center'}}>
+        {!ok&&<button className="dbtn" onClick={deploy} disabled={fired}>&#x26A1; Deploy Beam</button>}
+        {fired&&!ok&&<button className="gbtn" onClick={reset}>Reset</button>}
+      </div>
+      {att>0&&!ok&&<div style={{marginTop:8,fontSize:13,color:'#c7c7cc'}}>{att+' attempt'+(att!==1?'s':'')}</div>}
+      {ok&&<div className="mnote fup" style={{marginTop:28}}>
+        <div style={{fontSize:13,fontWeight:600,color:'#8e8e93',letterSpacing:'.06em',marginBottom:6}}>MATH CONNECTION</div>
+        <p style={{fontSize:15,color:'#3a3a3c',lineHeight:1.65,margin:0}}>
+          {sec.id==='1.1'&&<>Maser at origin &rarr; beam follows <em>y&nbsp;=&nbsp;mx</em>. Slope <em>m&nbsp;=&nbsp;tan(&theta;)</em>.</>}
+          {sec.id==='1.2'&&<>Three collinear points share the same slope. &Delta;y/&Delta;x = 50/150 = 1/3 between every pair.</>}
+          {sec.id==='1.3'&&<>Horizontal line &rarr; m = 0. No rise: &Delta;y = 0 &rarr; m = 0/&Delta;x = 0.</>}
+          {sec.id==='1.4'&&<>Larger slope = steeper line. As &theta; &rarr; 90&deg;, m &rarr; &infin;. Vertical lines have undefined slope.</>}
+        </p>
+      </div>}
+      <Agent msg={agMsg} setMsg={setAgMsg} onAsk={handleAskTotoro}/>
+    </div>);
+  }
+
+  // ── SlopeExplorer: 4-phase discovery component ─────────────────
+  // Canvas geometry
+  const GW=640,GH=400,GOX=64,GOY=340,GSX=1.42,GSY=1.12;
+  const gm2s=(mx,my)=>({x:GOX+mx*GSX, y:GOY-my*GSY});
+  const gs2m=(sx,sy)=>({mx:(sx-GOX)/GSX, my:(GOY-sy)/GSY});
+  const projectOnLine=(mx,my,lmx,lmy,ldx,ldy)=>{
+    const len2=ldx*ldx+ldy*ldy;
+    if(len2<0.0001)return{mx:lmx,my:lmy};
+    const t=((mx-lmx)*ldx+(my-lmy)*ldy)/len2;
+    return{mx:lmx+t*ldx,my:lmy+t*ldy,t};
+  };
+  const clampMath=(mx,my)=>({
+    mx:Math.max(2,Math.min((GW-GOX-12)/GSX,mx)),
+    my:Math.max(-(GOY-GH+12)/GSY,Math.min((GOY-12)/GSY,my))
+  });
+  // Clamp a point that must stay on the line (lmx+t*ldx, lmy+t*ldy) within canvas bounds.
+  // Returns the clamped point still ON the line by adjusting t.
+  const clampOnLine=(lmx,lmy,ldx,ldy,t)=>{
+    const mxMin=2, mxMax=(GW-GOX-12)/GSX;
+    const myMin=-(GOY-GH+12)/GSY, myMax=(GOY-12)/GSY;
+    let tMin=-Infinity, tMax=Infinity;
+    if(Math.abs(ldx)>0.0001){
+      tMin=Math.max(tMin,(mxMin-lmx)/ldx<(mxMax-lmx)/ldx?(mxMin-lmx)/ldx:(mxMax-lmx)/ldx);
+      tMax=Math.min(tMax,(mxMin-lmx)/ldx>(mxMax-lmx)/ldx?(mxMin-lmx)/ldx:(mxMax-lmx)/ldx);
+    }
+    if(Math.abs(ldy)>0.0001){
+      tMin=Math.max(tMin,(myMin-lmy)/ldy<(myMax-lmy)/ldy?(myMin-lmy)/ldy:(myMax-lmy)/ldy);
+      tMax=Math.min(tMax,(myMin-lmy)/ldy>(myMax-lmy)/ldy?(myMin-lmy)/ldy:(myMax-lmy)/ldy);
+    }
+    const tc=Math.max(tMin,Math.min(tMax,t));
+    return{mx:lmx+tc*ldx,my:lmy+tc*ldy};
+  };
+  // Knowledge checks: give coords, pick slope
+  const SE_KCS=[
+    {A:{mx:100,my:60},B:{mx:400,my:180},opts:['3/10','1/2','2/5','3/5'],cor:'2/5',
+     hint:'Δy = 180−60 = 120, Δx = 400−100 = 300. Simplify 120/300.'},
+    {A:{mx:50,my:250},B:{mx:350,my:100},opts:['−1/2','1/2','−3/4','3/4'],cor:'−1/2',
+     hint:'Δy = 100−250 = −150 (B is lower!), Δx = 300. Simplify −150/300.'},
+    {A:{mx:80,my:40},B:{mx:280,my:240},opts:['1','2','1/2','1/3'],cor:'1',
+     hint:'Δy = 200, Δx = 200. What is 200/200?'},
+  ];
+
+  // Inline fraction: stacked numerator/denominator with horizontal bar
+  function Frac({n,d,size=15,color='inherit'}){
+    return(
+      <span style={{display:'inline-flex',flexDirection:'column',alignItems:'center',verticalAlign:'middle',lineHeight:1.1,margin:'0 3px',fontSize:size,color}}>
+        <span style={{borderBottom:'1.5px solid currentColor',paddingBottom:'1px',lineHeight:1.2,whiteSpace:'nowrap'}}>{n}</span>
+        <span style={{lineHeight:1.2,whiteSpace:'nowrap'}}>{d}</span>
+      </span>
+    );
+  }
+
+  function SlopeExplorer({sRef,onDone,setLog}){
+    // Phases: 0=free drag  1=slope input  2=constrained slide+KCs  3=synthesis  4=KC problems
+    const[phase,setPhase]=useState(0);
+    const[aPos,setAPos]=useState({mx:80,my:60});
+    const[bPos,setBPos]=useState({mx:300,my:220});
+    const[dragging,setDragging]=useState(null);
+    const[hasDragged,setHasDragged]=useState(false);
+    const svgRef=useRef(null);
+    const[slopeInput,setSlopeInput]=useState('');
+    const[slopeGrade,setSlopeGrade]=useState(null);
+    const[qA,setQA]=useState(null);
+    const[qB,setQB]=useState(null);
+    const[kcIdx,setKcIdx]=useState(0);
+    const[kcAns,setKcAns]=useState(null);
+    const done=useRef(false);
+    const logEv=(sec,ans,ok)=>setLog(p=>({...p,answersLog:[...p.answersLog,{sec,answer:ans,correct:ok}]}));
+
+    const dy=bPos.my-aPos.my, dx=bPos.mx-aPos.mx;
+    const slopeDec=dx!==0?(dy/dx):null;
+    const slopeStr=slopeDec!==null?slopeDec.toFixed(3):'∞';
+    const ldx=dx||1, ldy=dy;
+
+    const getMP=e=>{
+      if(!svgRef.current)return{mx:0,my:0};
+      const r=svgRef.current.getBoundingClientRect();
+      const cx=e.touches?e.touches[0].clientX:e.clientX;
+      const cy=e.touches?e.touches[0].clientY:e.clientY;
+      return gs2m(((cx-r.left)/r.width)*GW,((cy-r.top)/r.height)*GH);
+    };
+    const onMouseMove=useCallback(e=>{
+      if(!dragging)return;
+      const raw=getMP(e);
+      if(phase<2){
+        const c=clampMath(raw.mx,raw.my);
+        if(dragging==='A'){setAPos(c);setHasDragged(true);}
+        else{setBPos(c);setHasDragged(true);}
+      } else {
+        const proj=projectOnLine(raw.mx,raw.my,aPos.mx,aPos.my,ldx,ldy);
+        const c=clampOnLine(aPos.mx,aPos.my,ldx,ldy,proj.t!=null?proj.t:0);
+        if(dragging==='A')setAPos(c);
+        else setBPos(c);
+      }
+    },[dragging,phase,aPos,bPos,ldx,ldy]);
+    const onMouseUp=useCallback(()=>setDragging(null),[]);
+    const onCookieDown=(e,which)=>{e.stopPropagation();setDragging(which);};
+
+    const checkSlope=()=>{
+      if(slopeDec===null){setSlopeGrade('no');return;}
+      // Parse decimal or fraction (e.g. "1/3", "-2/5", "0.333")
+      let v=NaN;
+      const trimmed=slopeInput.trim().replace(',','.');
+      if(trimmed.includes('/')){
+        const parts=trimmed.split('/');
+        if(parts.length===2){
+          const num=parseFloat(parts[0]),den=parseFloat(parts[1]);
+          if(!isNaN(num)&&!isNaN(den)&&den!==0)v=num/den;
+        }
+      } else {
+        v=parseFloat(trimmed);
+      }
+      if(isNaN(v)){setSlopeGrade('no');return;}
+      const ok=Math.abs(v-slopeDec)<=0.005;
+      setSlopeGrade(ok?'ok':'no');
+      logEv('se-slope',v,ok);
+      if(ok)setTimeout(()=>setPhase(2),1500);
+    };
+
+    const bothKCsOk=qA==='change'&&qB==='same';
+    useEffect(()=>{if(bothKCsOk&&phase===2)setTimeout(()=>setPhase(3),1800);},[bothKCsOk,phase]);
+
+    const kc=SE_KCS[kcIdx]||null;
+    const kcDy=kc?kc.B.my-kc.A.my:0, kcDx=kc?kc.B.mx-kc.A.mx:1;
+    const checkKC=opt=>{
+      if(kcAns!==null)return;
+      setKcAns(opt);
+      const ok=opt===kc.cor;
+      logEv('se-kc'+kcIdx,opt,ok);
+      if(ok){
+        if(kcIdx<SE_KCS.length-1)setTimeout(()=>{setKcIdx(i=>i+1);setKcAns(null);},2500);
+        else if(!done.current){done.current=true;onDone();}
+      }
+    };
+
+    const lineEndpoints=()=>{
+      const sa=gm2s(aPos.mx,aPos.my),sb=gm2s(bPos.mx,bPos.my);
+      const dsx=sb.x-sa.x,dsy=sb.y-sa.y,len=Math.sqrt(dsx*dsx+dsy*dsy);
+      if(len<1)return{x1:sa.x-400,y1:sa.y,x2:sa.x+400,y2:sa.y};
+      const ux=dsx/len,uy=dsy/len;
+      return{x1:sa.x-ux*900,y1:sa.y-uy*900,x2:sa.x+ux*900,y2:sa.y+uy*900};
+    };
+
+    // ── Sub-components ──────────────────────────────────────────
+    const GridLines=()=>{
+      const xt=[0,50,100,150,200,250,300,350,400,450];
+      const yt=[0,50,100,150,200,250,300];
+      return(<g>
+        {xt.map(v=><line key={'gx'+v} x1={GOX+v*GSX} y1={10} x2={GOX+v*GSX} y2={GH-4} stroke={v===0?'#d1d1d6':'#f0f0f0'} strokeWidth={v===0?1.5:1}/>)}
+        {yt.map(v=><line key={'gy'+v} x1={GOX-4} y1={GOY-v*GSY} x2={GW-10} y2={GOY-v*GSY} stroke={v===0?'#d1d1d6':'#f0f0f0'} strokeWidth={v===0?1.5:1}/>)}
+        <polygon points={`${GW-10},${GOY} ${GW-16},${GOY-4} ${GW-16},${GOY+4}`} fill="#c7c7cc"/>
+        <polygon points={`${GOX},10 ${GOX-4},16 ${GOX+4},16`} fill="#c7c7cc"/>
+        {[50,100,150,200,250,300,350,400].map(v=><text key={v} x={GOX+v*GSX} y={GOY+15} textAnchor="middle" fontSize="8" fill="#c7c7cc">{v}</text>)}
+        {[50,100,150,200,250].map(v=><text key={v} x={GOX-10} y={GOY-v*GSY+3} textAnchor="end" fontSize="8" fill="#c7c7cc">{v}</text>)}
+        <text x={GW-8} y={GOY+15} fontSize="9" fill="#aeaeb2">x</text>
+        <text x={GOX-16} y={14} fontSize="9" fill="#aeaeb2">y</text>
+      </g>);
+    };
+
+    const SlopeTriangle=({aP,bP})=>{
+      const sa=gm2s(aP.mx,aP.my),sb=gm2s(bP.mx,bP.my);
+      const tdy=bP.my-aP.my,tdx=bP.mx-aP.mx;
+      const corner={x:sb.x,y:sa.y};
+      const offDy=tdx>=0?18:-28;
+      const offDx=tdy>=0?-20:18;
+      return(<g opacity=".9">
+        <polygon points={`${sa.x},${sa.y} ${sb.x},${sb.y} ${corner.x},${corner.y}`} fill="rgba(255,215,80,.2)"/>
+        <line x1={sb.x} y1={sa.y} x2={sb.x} y2={sb.y} stroke="#34c759" strokeWidth="2.5" strokeDasharray="5 3"/>
+        <line x1={sa.x} y1={sa.y} x2={sb.x} y2={sa.y} stroke="#0a84ff" strokeWidth="2.5" strokeDasharray="5 3"/>
+        <rect x={corner.x-(tdx>0?9:0)} y={corner.y-(tdy>0?0:9)} width="9" height="9" fill="none" stroke="#aaa" strokeWidth="1"/>
+        <rect x={sb.x+offDy-20} y={(sa.y+sb.y)/2-9} width="46" height="16" rx="5" fill="#34c759"/>
+        <text x={sb.x+offDy+3} y={(sa.y+sb.y)/2+4} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">&Delta;y={Math.round(tdy)}</text>
+        <rect x={(sa.x+sb.x)/2-23} y={sa.y+offDx-8} width="46" height="16" rx="5" fill="#0a84ff"/>
+        <text x={(sa.x+sb.x)/2} y={sa.y+offDx+4} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">&Delta;x={Math.round(tdx)}</text>
+      </g>);
+    };
+
+    const CookieDot=({pos,label,draggingThis})=>{
+      const{x:sx,y:sy}=gm2s(pos.mx,pos.my);
+      const labelLeft=label==='A';
+      // coords go above cookie; letter label goes below
+      const coordY=pos.my<35?sy+38:sy-24;
+      return(<g style={{cursor:'grab'}} onMouseDown={e=>onCookieDown(e,label)} onTouchStart={e=>onCookieDown(e,label)}>
+        {draggingThis&&<circle cx={sx} cy={sy} r="22" fill="rgba(10,132,255,.1)" stroke="#0a84ff" strokeWidth="1.2" strokeDasharray="4 2"/>}
+        <circle cx={sx} cy={sy} r="15" fill="#F5DEB3" stroke="#c4a47a" strokeWidth="1.8"/>
+        <circle cx={sx-4} cy={sy-4} r="2.7" fill="#3d2200" opacity=".85"/>
+        <circle cx={sx+5} cy={sy-1} r="2.4" fill="#3d2200" opacity=".85"/>
+        <circle cx={sx+1} cy={sy+6} r="2.2" fill="#3d2200" opacity=".85"/>
+        {/* letter label: below the cookie */}
+        <text x={sx} y={sy+30} textAnchor="middle" fontSize="13" fill="#7a5010" fontWeight="700">{label}</text>
+        {/* coordinate label: above the cookie (or below if near bottom) */}
+        <text x={sx} y={coordY} textAnchor="middle" fontSize="10" fill="#636366" fontFamily="monospace">({Math.round(pos.mx)},{Math.round(pos.my)})</text>
+      </g>);
+    };
+
+    const LiveReadout=()=>(
+      <div style={{display:'flex',gap:10,marginTop:12,flexWrap:'wrap',justifyContent:'center'}}>
+        <div style={{background:'#e8faf0',border:'1.5px solid #a3e6be',borderRadius:10,padding:'7px 16px',fontFamily:'monospace',fontSize:15,fontWeight:600,color:'#1c5c35'}}>
+          &Delta;y = <span style={{color:'#34c759'}}>{Math.round(dy)}</span>
+        </div>
+        <div style={{background:'#f0f7ff',border:'1.5px solid #bae0ff',borderRadius:10,padding:'7px 16px',fontFamily:'monospace',fontSize:15,fontWeight:600,color:'#1c3a5c'}}>
+          &Delta;x = <span style={{color:'#0a84ff'}}>{Math.round(dx)}</span>
+        </div>
+        {phase!==1&&<div style={{background:'#f9f9fb',border:'1.5px solid #d1d1d6',borderRadius:10,padding:'7px 16px',fontFamily:'monospace',fontSize:15,fontWeight:600,color:'#1c1c1e'}}>
+          m = {dx!==0?slopeStr:'∞'}
+        </div>}
+      </div>
+    );
+
+    const PhasePills=()=>(
+      <div style={{display:'flex',gap:6,justifyContent:'center',marginBottom:14,flexWrap:'wrap'}}>
+        {['Drag & Explore','Compute Slope','Slide the Line','Key Takeaways'].map((lbl,i)=>(
+          <div key={i} style={{padding:'4px 13px',borderRadius:100,fontSize:13,fontWeight:600,
+            background:i<phase?'#34c759':i===phase?'#0a84ff':'#f2f2f7',
+            color:i<=phase?'#fff':'#aeaeb2',transition:'all .4s'}}>
+            {i<phase?'✓ ':''}{lbl}
+          </div>
+        ))}
+      </div>
+    );
+
+    const le=lineEndpoints();
+
+    // ── Phase 4: Knowledge Checks ────────────────────────────────
+    if(phase===4){
+      if(!kc)return null;
+      const kcSvgA=gm2s(kc.A.mx,kc.A.my),kcSvgB=gm2s(kc.B.mx,kc.B.my);
+      const kcCorner={x:kcSvgB.x,y:kcSvgA.y};
+      const dsx=kcSvgB.x-kcSvgA.x,dsy=kcSvgB.y-kcSvgA.y,kcLen=Math.sqrt(dsx*dsx+dsy*dsy);
+      const kcLine=kcLen>1?{x1:kcSvgA.x-dsx/kcLen*700,y1:kcSvgA.y-dsy/kcLen*700,x2:kcSvgA.x+dsx/kcLen*700,y2:kcSvgA.y+dsy/kcLen*700}:null;
+      return(<div ref={sRef} className="sec">
+        <div style={{textAlign:'center',marginBottom:20}}>
+          <div className="pill" style={{display:'inline-block',marginBottom:10}}>Level 1 · Slope Check</div>
+          <h2 className="serif" style={{fontSize:'clamp(20px,3.5vw,34px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 8px',letterSpacing:'-.02em'}}>Compute the Slope</h2>
+          <p style={{color:'#636366',fontSize:16,lineHeight:1.6}}>Problem {kcIdx+1} of {SE_KCS.length} — read the cookie coordinates, then pick the correct slope.</p>
+        </div>
+        <div style={{width:'100%',maxWidth:680,display:'flex',flexDirection:'column',gap:14}}>
+          <div className="wcard" style={{padding:'12px 14px'}}>
+            <svg viewBox={'0 0 '+GW+' '+GH} style={{width:'100%',borderRadius:8,background:'#fafafa'}}>
+              <GridLines/>
+              {kcLine&&<line x1={kcLine.x1} y1={kcLine.y1} x2={kcLine.x2} y2={kcLine.y2} stroke="#0a84ff" strokeWidth="1.8" strokeDasharray="8 4" opacity=".4"/>}
+              <polygon points={`${kcSvgA.x},${kcSvgA.y} ${kcSvgB.x},${kcSvgB.y} ${kcCorner.x},${kcCorner.y}`} fill="rgba(255,215,80,.2)"/>
+              <line x1={kcSvgB.x} y1={kcSvgA.y} x2={kcSvgB.x} y2={kcSvgB.y} stroke="#34c759" strokeWidth="2.2" strokeDasharray="5 3"/>
+              <rect x={kcSvgB.x+(kcDx>0?4:-46)} y={(kcSvgA.y+kcSvgB.y)/2-8} width="42" height="16" rx="4" fill="#34c759"/>
+              <text x={kcSvgB.x+(kcDx>0?25:-25)} y={(kcSvgA.y+kcSvgB.y)/2+4} textAnchor="middle" fontSize="9" fill="white" fontWeight="700">&Delta;y={kcDy}</text>
+              <line x1={kcSvgA.x} y1={kcSvgA.y} x2={kcSvgB.x} y2={kcSvgA.y} stroke="#0a84ff" strokeWidth="2.2" strokeDasharray="5 3"/>
+              <rect x={(kcSvgA.x+kcSvgB.x)/2-21} y={kcSvgA.y+(kcDy>0?-22:6)} width="42" height="16" rx="4" fill="#0a84ff"/>
+              <text x={(kcSvgA.x+kcSvgB.x)/2} y={kcSvgA.y+(kcDy>0?-9:19)} textAnchor="middle" fontSize="9" fill="white" fontWeight="700">&Delta;x={kcDx}</text>
+              <rect x={kcCorner.x-(kcDx>0?9:0)} y={kcCorner.y-(kcDy>0?0:9)} width="9" height="9" fill="none" stroke="#9ca3af" strokeWidth="1"/>
+              {[{pos:kc.A,lbl:'A'},{pos:kc.B,lbl:'B'}].map(({pos,lbl})=>{
+                const{x:sx,y:sy}=gm2s(pos.mx,pos.my);
+                return(<g key={lbl}>
+                  <circle cx={sx} cy={sy} r="15" fill="#F5DEB3" stroke="#c4a47a" strokeWidth="1.5"/>
+                  <circle cx={sx-4} cy={sy-4} r="2.6" fill="#3d2200" opacity=".85"/>
+                  <circle cx={sx+5} cy={sy-1} r="2.3" fill="#3d2200" opacity=".85"/>
+                  <circle cx={sx+1} cy={sy+6} r="2" fill="#3d2200" opacity=".85"/>
+                  <text x={sx} y={sy+30} textAnchor="middle" fontSize="13" fill="#7a5010" fontWeight="700">{lbl}</text>
+                  <text x={sx} y={sy-22} textAnchor="middle" fontSize="10" fill="#636366" fontFamily="monospace">({pos.mx},{pos.my})</text>
+                </g>);
+              })}
+            </svg>
+          </div>
+          <div className="qcard">
+            <div style={{fontSize:14,fontWeight:600,color:'#636366',letterSpacing:'.06em',marginBottom:10}}>KNOWLEDGE CHECK {kcIdx+1}/{SE_KCS.length}</div>
+            <p style={{fontSize:16,color:'#1c1c1e',margin:'0 0 5px'}}>Cookie A = <strong>({kc.A.mx}, {kc.A.my})</strong>, Cookie B = <strong>({kc.B.mx}, {kc.B.my})</strong></p>
+            <div style={{fontFamily:'monospace',fontSize:15,color:'#636366',margin:'0 0 14px',background:'#f9f9fb',borderRadius:8,padding:'8px 12px',display:'inline-block'}}>
+              &Delta;y = {kc.B.my}&minus;{kc.A.my} = {kcDy}&nbsp;&nbsp;|&nbsp;&nbsp;&Delta;x = {kc.B.mx}&minus;{kc.A.mx} = {kcDx}
+            </div>
+            <p style={{fontSize:16,fontWeight:600,color:'#1c1c1e',margin:'0 0 14px',display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>What is the slope m =<Frac n={<>&Delta;y</>} d={<>&Delta;x</>} size={15}/> ?</p>
+            <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+              {kc.opts.map(opt=>{
+                const isok=opt===kc.cor,mine=kcAns===opt;
+                let bg='#fff',brd='#e5e5ea',col='#3a3a3c';
+                if(kcAns){if(isok){bg='#e8faf0';brd='#34c759';col='#1c5c35';}else if(mine){bg='#fff4f4';brd='#ff3b30';col='#9b1c1c';}else{col='#aeaeb2';}}
+                return<button key={opt} className="mcbtn" style={{background:bg,borderColor:brd,color:col}} onClick={()=>checkKC(opt)} disabled={!!kcAns}>{opt}</button>;
+              })}
+            </div>
+            {kcAns&&kcAns!==kc.cor&&<p style={{fontSize:16,color:'#ff6b35',marginTop:10,lineHeight:1.5}}>Not quite. {kc.hint}</p>}
+            {kcAns===kc.cor&&<p style={{fontSize:16,color:'#34c759',marginTop:10,fontWeight:600}}>&#x2713; Correct! {kcIdx<SE_KCS.length-1?'Next one…':'All done — section complete!'}</p>}
+          </div>
+        </div>
+      </div>);
+    }
+
+    // ── Phases 0–3: main interactive section ───────────────────
+    return(<div ref={sRef} className="sec" style={{paddingBottom:80}}>
+      <div style={{textAlign:'center',marginBottom:16,width:'100%',maxWidth:700}}>
+        <div className="pill" style={{display:'inline-block',marginBottom:10}}>Level 1 · The Ratio</div>
+        <h2 className="serif" style={{fontSize:'clamp(22px,4vw,38px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 8px',letterSpacing:'-.02em'}}>
+          {phase===0&&'Drag & Discover'}
+          {phase===1&&"What's the Ratio?"}
+          {phase===2&&'Slide Along the Line'}
+          {phase>=3&&'Key Takeaways'}
+        </h2>
+        <p style={{color:'#636366',fontSize:16,lineHeight:1.65,maxWidth:520,margin:'0 auto'}}>
+          {phase===0&&<>Two cookies sit on a Cartesian grid. A line passes through both. <strong>Drag either cookie</strong> anywhere on the plane — watch how the line, the slope triangle, and the <Frac n={<>&Delta;y</>} d={<>&Delta;x</>} size={14}/> readout update in real-time.</>}
+          {phase===1&&<>The <span style={{color:'#34c759',fontWeight:600}}>green dashed side</span> of the triangle shows rise (&Delta;y) and the <span style={{color:'#0a84ff',fontWeight:600}}>blue dashed side</span> shows run (&Delta;x). Based on the live readout, compute the slope &mdash; then type it below.</>}
+          {phase===2&&<>The line is now <strong>locked in place</strong>. Drag either cookie and it will slide along the line. Watch the triangle grow and shrink as you move them closer or farther apart. Then answer the questions below.</>}
+          {phase>=3&&<>You&apos;ve just discovered two fundamental truths about slope. Here&apos;s your math tutor&apos;s summary.</>}
+        </p>
+      </div>
+
+      <PhasePills/>
+
+      {/* Slope definition — shown from the very start */}
+      {phase<3&&<div className="defcard fup" style={{width:'100%',maxWidth:560,marginBottom:14}}>
+        <div style={{fontSize:13,fontWeight:600,color:'#0a84ff',letterSpacing:'.06em',marginBottom:8}}>DEFINITION — SLOPE</div>
+        <div style={{textAlign:'center',padding:'10px 0',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+          <span style={{fontSize:18,fontFamily:'Georgia,serif',color:'#1c1c1e'}}>m =</span>
+          <Frac n={<>&Delta;y</>} d={<>&Delta;x</>} size={20}/>
+          <span style={{fontSize:18,fontFamily:'Georgia,serif',color:'#1c1c1e'}}>=</span>
+          <Frac n={<>y<sub>B</sub>&nbsp;&minus;&nbsp;y<sub>A</sub></>} d={<>x<sub>B</sub>&nbsp;&minus;&nbsp;x<sub>A</sub></>} size={16}/>
+        </div>
+        <p style={{fontSize:14,color:'#636366',lineHeight:1.6,margin:'8px 0 0'}}>&Delta; (&ldquo;delta&rdquo;) means &ldquo;change in.&rdquo; Slope is <em>rise over run</em>: how much the line goes up for every unit it goes right.</p>
+      </div>}
+
+      {/* Main SVG canvas */}
+      <div className="wcard" style={{padding:'10px',width:'100%',maxWidth:700}}>
+        <svg ref={svgRef} viewBox={'0 0 '+GW+' '+GH}
+             style={{width:'100%',borderRadius:8,background:'#fafafa',touchAction:'none',cursor:dragging?'grabbing':'default'}}
+             onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
+             onTouchMove={onMouseMove} onTouchEnd={onMouseUp}>
+          <GridLines/>
+          <line x1={le.x1} y1={le.y1} x2={le.x2} y2={le.y2}
+                stroke="#0a84ff" strokeWidth="2.2"
+                opacity={phase>=2?".75":".4"}
+                strokeDasharray={phase>=2?'none':'8 4'}/>
+          {phase===0&&[aPos,bPos].map((p,i)=>{
+            const{x:sx,y:sy}=gm2s(p.mx,p.my);
+            return<circle key={i} cx={sx} cy={sy} r="24" fill="rgba(10,132,255,.06)" className="hpulse"/>;
+          })}
+          <SlopeTriangle aP={aPos} bP={bPos}/>
+          <CookieDot pos={aPos} label="A" draggingThis={dragging==='A'}/>
+          <CookieDot pos={bPos} label="B" draggingThis={dragging==='B'}/>
+          {phase===0&&!hasDragged&&<>
+            <text x={gm2s(aPos.mx,aPos.my).x+22} y={gm2s(aPos.mx,aPos.my).y-26} fontSize="11" fill="#aeaeb2" fontStyle="italic">drag me!</text>
+            <text x={gm2s(bPos.mx,bPos.my).x-22} y={gm2s(bPos.mx,bPos.my).y-26} fontSize="11" fill="#aeaeb2" fontStyle="italic" textAnchor="end">or me!</text>
+          </>}
+          {phase>=2&&<>
+            <rect x={GOX+4} y={8} width={108} height={20} rx="7" fill="rgba(10,132,255,.85)"/>
+            <text x={GOX+58} y={21} textAnchor="middle" fontSize="9.5" fill="white" fontWeight="600">&#x1F512; Line locked</text>
+          </>}
+        </svg>
+        <div style={{marginTop:6,fontSize:13,color:'#8e8e93',textAlign:'center'}}>
+          {phase===0&&<>&#9698; Drag cookie A or B anywhere &mdash; the line and triangle update live</>}
+          {phase===1&&<>Drag to try more positions, then compute the slope below</>}
+          {phase===2&&<>Slide the cookies closer together or further apart along the locked line</>}
+        </div>
+      </div>
+
+      <LiveReadout/>
+
+      {/* Phase 0: explore then continue */}
+      {phase===0&&<div style={{marginTop:18,textAlign:'center'}}>
+        {hasDragged
+          ?<><p style={{fontSize:15,color:'#636366',marginBottom:12}}>Notice how the line follows both cookies? Try different positions, then continue when ready.</p><button className="nbtn" onClick={()=>setPhase(1)}>I&apos;ve explored &rarr;</button></>
+          :<p style={{fontSize:15,color:'#aeaeb2',marginTop:4}}>&#x1F36A; Move a cookie to unlock the next step</p>
+        }
+      </div>}
+
+      {phase===1&&<div className="qcard fup" style={{marginTop:16,width:'100%',maxWidth:480}}>
+        <div style={{fontSize:15,fontWeight:600,color:'#636366',letterSpacing:'.06em',marginBottom:10}}>COMPUTE THE SLOPE</div>
+        <p style={{fontSize:16,color:'#1c1c1e',margin:'0 0 14px',display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>Use the &Delta;y and &Delta;x readouts above to calculate <strong style={{display:'inline-flex',alignItems:'center',gap:4}}>m =<Frac n={<>&Delta;y</>} d={<>&Delta;x</>} size={16}/></strong>:</p>
+        <div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
+          <input value={slopeInput} onChange={e=>setSlopeInput(e.target.value)}
+                 onKeyDown={e=>e.key==='Enter'&&checkSlope()}
+                 placeholder="e.g. 0.75 or 3/4"
+                 style={{border:'1.5px solid '+(slopeGrade==='ok'?'#34c759':slopeGrade==='no'?'#ff3b30':'#d1d1d6'),borderRadius:10,padding:'11px 15px',fontSize:16,fontFamily:'monospace',width:165,outline:'none',background:'#fff',color:'#1c1c1e'}}/>
+          <button className="dbtn" onClick={checkSlope} style={{padding:'11px 24px',fontSize:15}}>Check &rarr;</button>
+        </div>
+        <p style={{fontSize:14,color:'#aeaeb2',marginTop:8}}>Enter a decimal (e.g. 0.5) or fraction (e.g. 1/2 or &minus;2/3).</p>
+        {slopeGrade==='no'&&<p style={{marginTop:10,fontSize:16,color:'#ff3b30',lineHeight:1.5}}>Not quite — check the green &Delta;y and blue &Delta;x readouts, then divide.</p>}
+        {slopeGrade==='ok'&&<p style={{marginTop:10,fontSize:16,color:'#34c759',fontWeight:600}}>&#x2713; Correct! Locking the line&hellip;</p>}
+      </div>}
+
+      {/* Phase 2: constrained slide + two KCs */}
+      {phase===2&&<div style={{marginTop:16,width:'100%',maxWidth:580,display:'flex',flexDirection:'column',gap:14}}>
+        <div className="icard fup" style={{textAlign:'center',padding:'12px 18px'}}>
+          <span style={{fontSize:15,color:'#4338ca'}}>Slide the cookies along the line above, then answer both questions:</span>
+        </div>
+        <div style={{display:'flex',gap:14,flexWrap:'wrap',justifyContent:'center'}}>
+          <div className="qcard fup" style={{flex:'1 1 230px',minWidth:0}}>
+            <div style={{fontSize:14,fontWeight:700,color:'#0a84ff',letterSpacing:'.06em',marginBottom:8}}>QUESTION A</div>
+            <p style={{fontSize:15,color:'#1c1c1e',margin:'0 0 12px',lineHeight:1.55}}>As you slide the cookies along the line, what happens to <strong style={{color:'#34c759'}}>&Delta;y</strong> and <strong style={{color:'#0a84ff'}}>&Delta;x</strong>?</p>
+            {['change','same'].map(opt=>{
+              const cor='change';
+              let bg='#fff',brd='#e5e5ea',col='#3a3a3c';
+              if(qA){if(opt===cor){bg='#e8faf0';brd='#34c759';col='#1c5c35';}else if(qA===opt){bg='#fff4f4';brd='#ff3b30';col='#9b1c1c';}else{col='#aeaeb2';}}
+              return<button key={opt} onClick={()=>{if(qA)return;setQA(opt);logEv('se-qa',opt,opt===cor);}} disabled={!!qA}
+                style={{display:'block',width:'100%',textAlign:'left',padding:'11px 15px',borderRadius:10,border:'1.5px solid '+brd,background:bg,color:col,fontSize:15,cursor:qA?'default':'pointer',marginBottom:8,transition:'all .15s',fontFamily:'DM Sans,sans-serif'}}>
+                {opt==='change'?'They change (grow or shrink)':'They stay the same'}
+              </button>;
+            })}
+            {qA==='same'&&<p style={{fontSize:15,color:'#ff6b35',marginTop:4,lineHeight:1.5}}>Slide the cookies far apart, then close together &mdash; watch the green &Delta;y and blue &Delta;x readouts. Do they change?</p>}
+            {qA==='change'&&<p style={{fontSize:15,color:'#34c759',marginTop:4}}>&#x2713; Yes! &Delta;y and &Delta;x grow and shrink as you separate the cookies.</p>}
+          </div>
+          <div className="qcard fup" style={{flex:'1 1 230px',minWidth:0}}>
+            <div style={{fontSize:14,fontWeight:700,color:'#0a84ff',letterSpacing:'.06em',marginBottom:8}}>QUESTION B</div>
+            <p style={{fontSize:15,color:'#1c1c1e',margin:'0 0 12px',lineHeight:1.55}}>As you slide the cookies, what happens to the <strong>ratio<Frac n={<>&Delta;y</>} d={<>&Delta;x</>} size={14}/></strong> (the m= readout)?</p>
+            {['same','change'].map(opt=>{
+              const cor='same';
+              let bg='#fff',brd='#e5e5ea',col='#3a3a3c';
+              if(qB){if(opt===cor){bg='#e8faf0';brd='#34c759';col='#1c5c35';}else if(qB===opt){bg='#fff4f4';brd='#ff3b30';col='#9b1c1c';}else{col='#aeaeb2';}}
+              return<button key={opt} onClick={()=>{if(qB)return;setQB(opt);logEv('se-qb',opt,opt===cor);}} disabled={!!qB}
+                style={{display:'block',width:'100%',textAlign:'left',padding:'11px 15px',borderRadius:10,border:'1.5px solid '+brd,background:bg,color:col,fontSize:15,cursor:qB?'default':'pointer',marginBottom:8,transition:'all .15s',fontFamily:'DM Sans,sans-serif'}}>
+                {opt==='same'?'It stays the same':'It changes'}
+              </button>;
+            })}
+            {qB==='change'&&<p style={{fontSize:15,color:'#ff6b35',marginTop:4,lineHeight:1.5}}>Watch the &ldquo;m =&rdquo; readout as you slide &mdash; does that number ever change?</p>}
+            {qB==='same'&&<p style={{fontSize:15,color:'#34c759',marginTop:4}}>&#x2713; Exactly! The ratio stays constant &mdash; that&apos;s the whole point!</p>}
+          </div>
+        </div>
+        {bothKCsOk&&<p className="fup" style={{fontSize:16,color:'#34c759',textAlign:'center',fontWeight:600,marginTop:4}}>&#x2713; Both correct! Loading key takeaways&hellip;</p>}
+      </div>}
+
+      {/* Phase 3: synthesis */}
+      {phase===3&&<div style={{marginTop:16,width:'100%',maxWidth:580,display:'flex',flexDirection:'column',gap:14}}>
+        <div style={{display:'flex',gap:16,alignItems:'flex-start',background:'#f0f4ff',borderRadius:18,padding:'20px 22px',border:'1.5px solid #c7d2fe'}}>
+          <svg viewBox="0 0 150 200" width="56" height="75" style={{flexShrink:0,marginTop:2}}>
+            <g transform="translate(0,90)"><ellipse cx="75" cy="70" rx="60" ry="50" fill="#5F9EA0"/><ellipse cx="35" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(-10 35 15)"/><ellipse cx="115" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(10 115 15)"/><ellipse cx="75" cy="80" rx="45" ry="38" fill="white"/><g transform="translate(0,25)"><circle cx="50" cy="15" r="7" fill="black"/><circle cx="100" cy="15" r="7" fill="black"/><circle cx="51" cy="12" r="2.5" fill="white"/><circle cx="101" cy="12" r="2.5" fill="white"/><polygon points="75,20 70,14 80,14" fill="#2F4F4F"/><line x1="25" y1="20" x2="40" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/><line x1="25" y1="28" x2="40" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/><line x1="125" y1="20" x2="110" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/><line x1="125" y1="28" x2="110" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/></g></g>
+          </svg>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,fontSize:14,color:'#4338ca',marginBottom:14,letterSpacing:'.05em'}}>YOUR MATH TUTOR&apos;S SUMMARY</div>
+            {[
+              {n:'1',c:'#6366f1',title:'Two points determine a line',
+               body:<>Any two distinct points in the plane fix exactly one line. Two cookies is all you ever need.</>},
+              {n:'2',c:'#0a84ff',title:'Slope is constant everywhere on a line',
+               body:<>You proved this by sliding the cookies! Pick any two points on the same line — <Frac n={<>&Delta;y</>} d={<>&Delta;x</>} size={14}/> always gives the exact same number. That number IS the slope.</>},
+              {n:'3',c:'#34c759',title:"The order of the points doesn't matter",
+               body:<>Measuring from B to A? Both &Delta;y and &Delta;x flip sign — but <Frac n="−Δy" d="−Δx" size={14}/> = <Frac n="Δy" d="Δx" size={14}/>. The slope is the same either way.</>},
+            ].map(({n,c,title,body})=>(
+              <div key={n} style={{marginBottom:14,paddingLeft:14,borderLeft:'3px solid '+c}}>
+                <div style={{fontWeight:600,fontSize:15,color:'#1c1c1e',marginBottom:4}}>Observation {n}: {title}</div>
+                <div style={{fontSize:15,color:'#3a3a3c',lineHeight:1.8,display:'flex',alignItems:'center',flexWrap:'wrap',gap:2}}>{body}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{textAlign:'center'}}>
+          <button className="nbtn" onClick={()=>setPhase(4)}>Practice Problems &rarr;</button>
+        </div>
+      </div>}
+    </div>);
+  }
+
+
+  function KCSec({sec,sRef,onDone,setLog}){
+    const[ch,setCh]=useState(null);
+    const[wrong,setWrong]=useState(false);
+    const done=useRef(false);
+    const pick=id=>{
+      if(ch!=null)return;setCh(id);
+      const ok=id===sec.cor;
+      setLog(p=>({...p,answersLog:[...p.answersLog,{sec:sec.id,answer:id,correct:ok}]}));
+      if(ok){
+        if(!done.current){done.current=true;onDone();}
+      } else {
+        setWrong(true);
+        setTimeout(()=>setCh(null),1400);
+      }
+    };
+    const Beam=({a})=>{
+      const cos=Math.cos(a),sin=Math.sin(a),vert=Math.abs(Math.abs(a)-Math.PI/2)<.1;
+      const ox=12,oy=55,ex=vert?ox:Math.min(82,Math.max(10,ox+cos*65)),ey=vert?10:Math.min(68,Math.max(5,oy-sin*65));
+      return(<svg width="88" height="72" viewBox="0 0 88 72" style={{display:'block',margin:'0 auto 6px'}}>
+        <line x1="8" y1="62" x2="80" y2="62" stroke="#e5e5ea" strokeWidth="1"/>
+        <line x1="8" y1="10" x2="8"  y2="62" stroke="#e5e5ea" strokeWidth="1"/>
+        <line x1={ox} y1={oy} x2={ex} y2={ey} stroke="#0a84ff" strokeWidth="2.2" strokeLinecap="round"/>
+        <circle cx={ox} cy={oy} r="3" fill="#0a84ff" opacity=".7"/>
+      </svg>);
+    };
+    return(<div ref={sRef} className="sec secctr">
+      <div style={{textAlign:'center',marginBottom:40,width:'100%',maxWidth:560}}>
+        <div className="pill" style={{display:'inline-block',marginBottom:12}}>{sec.pill}</div>
+        <h2 className="serif" style={{fontSize:'clamp(20px,3.5vw,34px)',fontWeight:400,color:'#1c1c1e',margin:0,letterSpacing:'-.02em'}}>{sec.q}</h2>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,width:'100%',maxWidth:480}}>
+        {sec.opts.map(opt=>{
+          const isok=opt.id===sec.cor,mine=ch===opt.id;
+          let cl='kco';if(ch!=null){if(isok)cl+=' ok';else if(mine)cl+=' no';else cl+=' dim';}
+          return(<button key={opt.id} className={cl} onClick={()=>pick(opt.id)} disabled={ch!=null}>
+            <Beam a={opt.a}/>
+            <span style={{fontSize:15,fontWeight:600,color:ch==null?'#1c1c1e':isok?'#1c5c35':mine?'#9b1c1c':'#aeaeb2'}}>{opt.id}</span>
+          </button>);
+        })}
+      </div>
+      {ch!=null&&ch!==sec.cor&&<div className="fup" style={{marginTop:22,maxWidth:420,padding:'14px 20px',background:'#f0f4ff',borderRadius:14,border:'1.5px solid #c7d2fe',textAlign:'center'}}>
+        <p style={{fontSize:16,color:'#4338ca',lineHeight:1.6,margin:'0 0 0 0'}}>&#x1F914; {sec.soc}</p>
+      </div>}
+      {wrong&&ch==null&&<div className="fup" style={{marginTop:14,maxWidth:420,display:'flex',gap:12,alignItems:'center',justifyContent:'center',flexWrap:'wrap'}}>
+        <span style={{fontSize:14,color:'#636366'}}>Try again, or</span>
+        <button className="gbtn" onClick={()=>{if(!done.current){done.current=true;onDone();}}} style={{fontSize:14,padding:'8px 18px'}}>Continue anyway →</button>
+      </div>}
+      {ch===sec.cor&&<div className="scard fup" style={{marginTop:22}}><div style={{fontSize:24,marginBottom:4}}>&#x2713;</div><div style={{fontWeight:600,fontSize:15,color:'#1c5c35'}}>Correct!</div></div>}
+    </div>);
+  }
+
+  function L2SubSec({subId,sRef,onDone,setLog}){
+    const data=L2S[subId];
+    const[angle,setAngle]=useState(data.a0);
+    const[b,setB]=useState(data.b0);
+    const[fired,setFired]=useState(false);
+    const[baked,setBaked]=useState(new Set());
+    const[hits,setHits]=useState(new Set());
+    const[att,setAtt]=useState(0);
+    const[blk,setBlk]=useState(false);
+    const[blkPt,setBlkPt]=useState(null);
+    const[ok,setOk]=useState(false);
+    const[showY,setShowY]=useState(false);
+    const[agMsg,setAgMsg]=useState('');
+    const done=useRef(false);
+    const vert=Math.abs(Math.abs(angle)-Math.PI/2)<.02,slope=vert?'∞':Math.tan(angle).toFixed(2);
+
+    const ha=useCallback(a=>{
+      if(ok&&done.current)return;setAngle(a);
+      if(fired){setFired(false);setHits(new Set());setBlk(false);setAgMsg('');}
+    },[fired,ok]);
+    const hb=useCallback(nb=>{
+      if(ok&&done.current)return;setB(nb);
+      if(fired){setFired(false);setHits(new Set());setBlk(false);setAgMsg('');}
+    },[fired,ok]);
+    const deploy=()=>{
+      const n=att+1;setAtt(n);setFired(true);
+      let isBlk=false,bp=null;
+      for(const o of (data.obs||[])){
+        if(beamBlocked(angle,b,o)){isBlk=true;bp=blockedPt(angle,b,o);break;}
+      }
+      setLog(p=>({...p,answersLog:[...p.answersLog,{sec:'l2-'+subId,att:n,angle:(angle*180/Math.PI).toFixed(1),b:Math.round(b),blocked:isBlk}]}));
+      if(isBlk){
+        setBlk(true);setBlkPt(bp);setHits(new Set());
+        setAgMsg("The slope is right, but the beam is starting too low. What happens if we add a higher y-value to our starting point?");
+        return;
+      }
+      setBlk(false);
+      const h=new Set();
+      data.cookies.forEach(c=>{if(rayHits(angle,c.mx,c.my,b))h.add(c.id);});
+      setHits(h);setBaked(p=>{const s=new Set(p);h.forEach(id=>s.add(id));return s;});
+      if(h.size===data.cookies.length&&!done.current){
+        done.current=true;setOk(true);
+        if(data.yReveal){setTimeout(()=>setShowY(true),300);setTimeout(()=>setAgMsg(data.agOk),800);}
+        onDone();
+      }
+    };
+    const reset=()=>{setFired(false);setHits(new Set());setBlk(false);if(!done.current){setOk(false);setShowY(false);}setAgMsg('');};
+    const handleAskTotoro=()=>{
+      setAgMsg(att===0?'Try taking a shot first so I can see what you\'re thinking! Or remember: '+data.hint:'Hint: '+data.hint);
+    };
+    const miss=fired&&hits.size===0&&!blk,partial=fired&&hits.size>0&&hits.size<data.cookies.length&&!blk;
+
+    return(<div ref={sRef} className="sec" style={{position:'relative'}}>
+      <div style={{textAlign:'center',marginBottom:20,width:'100%',maxWidth:700}}>
+        <div className="pill" style={{display:'inline-block',marginBottom:10}}>{data.pill}</div>
+        <h2 className="serif" style={{fontSize:'clamp(22px,4vw,38px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 8px',letterSpacing:'-.02em',lineHeight:1.15}}>{data.title}</h2>
+        <p style={{color:'#636366',fontSize:16,lineHeight:1.6,margin:'0 auto',maxWidth:460}}>{data.desc}</p>
+      </div>
+      <div style={{marginBottom:14}}><L2Hud angle={angle} b={b}/></div>
+      <Canvas2 angle={angle} onAngle={ha} b={b} onB={hb} fired={fired} baked={baked} hits={hits}
+               cookies={data.cookies} obs={data.obs||[]} trees={data.trees||[]}
+               showY={showY} blocked={blk} blkPt={blkPt}
+               lockAngle={data.lock} allowNeg={data.neg}/>
+      <div style={{marginTop:10,display:'flex',gap:14,flexWrap:'wrap',justifyContent:'center'}}>
+        {data.lock
+          ?<div className="lifthint">&#x1F512; Angle locked at 0°. Drag the LEFT side of canvas to raise the lift ↕</div>
+          :<div style={{fontSize:14,color:'#c7c7cc',display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}><span>🎯 Drag right side → aim barrel</span><span>↕ Drag left side → raise lift</span></div>
+        }
+      </div>
+      {!fired&&!ok&&<div className="hcard" style={{marginTop:14}}>&#x1F4A1; {data.hint}</div>}
+      {angle<-.05&&!ok&&<div className="fup" style={{marginTop:12,padding:'10px 16px',background:'#fff4ef',border:'1.5px solid #ffcbba',borderRadius:12,maxWidth:420,textAlign:'center',fontSize:15,color:'#c24a22'}}>
+        &#x1F4D0; Negative slope! m = {Math.tan(angle).toFixed(2)} &mdash; the beam tilts <strong>downward</strong> from left to right. &Delta;y / &Delta;x &lt; 0.
+      </div>}
+      {blk&&<div className="blkcard fup" style={{marginTop:14}}><div style={{fontSize:20,marginBottom:5}}>&#x1F6A7; Blocked!</div><div style={{color:'#636366',fontSize:15,lineHeight:1.5}}>Beam hit the can. Raise the scissor lift!{att>=data.hintAfter&&<span style={{color:'#8e8e93'}}> Hint: lift above the obstacle height.</span>}</div></div>}
+      {miss&&<div className="mcard fup" style={{marginTop:14}}><div style={{fontSize:20,marginBottom:5}}>&#x1F3AF; Miss</div><div style={{color:'#636366',fontSize:15,lineHeight:1.5}}>Beam missed. Adjust aim or lift.{att>=data.hintAfter&&<span style={{color:'#8e8e93'}}>{' '+data.hint}</span>}</div></div>}
+      {partial&&<div className="pcard fup" style={{marginTop:14}}><div style={{fontSize:20,marginBottom:5}}>&#x1F3AF; Partial ({hits.size}/{data.cookies.length})</div><div style={{color:'#636366',fontSize:15}}>Hit some! Adjust slope and y-intercept to pass through both.</div></div>}
+      {ok&&<div className="scard fup" style={{marginTop:14}}>
+        <div style={{fontSize:24,marginBottom:6}}>&#x1F36A;&#x2728;</div>
+        <div style={{fontWeight:600,fontSize:15,color:'#1c5c35',marginBottom:6}}>{data.okT}</div>
+        <div style={{color:'#2d7a4b',fontSize:15,lineHeight:1.6}}>{data.okB(b,slope)}</div>
+      </div>}
+      {ok&&data.negTeach&&<div className="mnote fup" style={{marginTop:18}}>
+        <div style={{fontSize:13,fontWeight:600,color:'#8e8e93',letterSpacing:'.06em',marginBottom:6}}>POSITIVE vs NEGATIVE SLOPE</div>
+        <p style={{fontSize:15,color:'#3a3a3c',lineHeight:1.65,margin:0}}>
+          Lines rising left &rarr; right have <strong>positive slope</strong> (m &gt; 0). Lines falling have <strong>negative slope</strong> (m &lt; 0). Horizontal: slope = 0. Vertical: slope is <em>undefined</em>.
+        </p>
+      </div>}
+      <div style={{display:'flex',gap:12,marginTop:20,flexWrap:'wrap',justifyContent:'center'}}>
+        {!ok&&<button className="dbtn" onClick={deploy} disabled={fired&&!blk&&!miss&&!partial}>&#x26A1; Deploy Beam</button>}
+        {fired&&!ok&&<button className="gbtn" onClick={reset}>Reset</button>}
+      </div>
+      {att>0&&!ok&&<div style={{marginTop:8,fontSize:13,color:'#c7c7cc'}}>{att+' attempt'+(att!==1?'s':'')}</div>}
+      <Agent msg={agMsg} setMsg={setAgMsg} onAsk={handleAskTotoro}/>
+    </div>);
+  }
+
+  // ════════════════════════════ LEVEL 3 ══════════════════════════
+  // Six sub-levels: precision algebraic targeting
+  const L3S={
+    // 3.1-3.3: lift drag still allowed (training wheels on b)
+    // 3.4-3.6: lift drag removed; b must be computed and keyed in
+    '3.1':{pill:'Level 3 · Measure & Enter',title:'Precision Targeting',
+      mode:'measure', liftDrag:true,
+      desc:'Two cookies are at known grid coordinates. Drag between them to measure the slope triangle, type m in the keypad, adjust the lift, then fire.',
+      cookies:[{id:'A',mx:100,my:100},{id:'B',mx:400,my:250}],obs:[],trees:[],
+      hintAfter:2,hint:'Drag between the two cookies to read off Δy and Δx. Divide them for m. b=50 puts the beam through both.',
+      okT:'Precision hit!',okB:(b,m)=>'You measured m = '+m+' and fired y = '+m+'x + '+Math.round(b)+'.'},
+    '3.2':{pill:'Level 3 · Measure & Enter',title:'Downward Line',
+      mode:'measure', liftDrag:true,
+      desc:'These cookies define a line with negative slope. Drag to measure, type the negative m, adjust the lift, and fire.',
+      cookies:[{id:'A',mx:100,my:210},{id:'B',mx:500,my:50}],obs:[],trees:[],
+      hintAfter:2,hint:'Δy is negative here — B is lower than A. The slope m = (50−210)/(500−100) = −0.4.',
+      okT:'Negative slope nailed!',okB:(b,m)=>'Line y = '+m+'x + '+Math.round(b)+' — nicely done.'},
+    '3.3':{pill:'Level 3 · Compute from Coords',title:'No Measuring Tool',
+      mode:'compute', liftDrag:true,
+      desc:'The slope tool is gone. Calculate Δy and Δx from the coordinates, divide for m, type it in. The lift is still draggable to clear the obstacle.',
+      cookies:[{id:'A',mx:100,my:130},{id:'B',mx:400,my:280}],obs:[{mx:220,width:40,height:150}],trees:[],
+      hintAfter:2,hint:'m = (280−130)/(400−100) = 150/300 = 1/2. Raise the lift above 25 to clear the bench.',
+      okT:'Computed and cleared!',okB:(b,m)=>'Δy=150, Δx=300 → m = 1/2. Beam: y = '+m+'x + '+Math.round(b)+'.'},
+    '3.4':{pill:'Level 3 · Point-Slope Form',title:'Write the Equation',
+      mode:'pointslope', liftDrag:false,
+      desc:'Enter point-slope form: y − y₁ = m(x − x₁). The parser sets both angle and lift. Both cookies must be baked in one shot.',
+      cookies:[{id:'A',mx:0,my:20},{id:'B',mx:300,my:170}],obs:[],trees:[],
+      px1:0,py1:20,
+      hintAfter:2,hint:'m = (170−20)/(300−0) = 1/2. Write: y−20 = 0.5(x−0), which simplifies to y−20 = 0.5x. The parser will set b = 20.',
+      okT:'Point-slope mastered!',okB:(b,m)=>'Parsed: m = '+m+', b = '+Math.round(b)+'. Both cookies baked!'},
+    '3.5':{pill:'Level 3 · Slope-Intercept Form',title:'Find m and b',
+      mode:'slopeintercept', liftDrag:false,
+      desc:'No lift drag. The beam must pass through both cookies. Compute m from the two points, plug one in to solve for b, then enter both.',
+      cookies:[{id:'A',mx:0,my:30},{id:'B',mx:400,my:130}],obs:[],trees:[],
+      refPt:null,
+      hintAfter:2,hint:'m = (130−30)/(400−0) = 100/400 = 1/4. Cookie A is at (0,30), so b = 30 directly.',
+      okT:'Slope-intercept form!',okB:(b,m)=>'y = '+m+'x + '+Math.round(b)+'. Both cookies baked from scratch!'},
+    '3.6':{pill:'Level 3 · Full Mastery',title:'Two Points, One Beam',
+      mode:'slopeintercept', liftDrag:false,
+      desc:'No hints, no lift drag. Two cookies sit on the same line. Find m and b from their coordinates and bake both in one shot.',
+      cookies:[{id:'A',mx:200,my:130},{id:'B',mx:500,my:280}],obs:[],trees:[],
+      refPt:null,
+      hintAfter:3,hint:'m = (280−130)/(500−200) = 150/300 = 1/2. Use A: 130 = 0.5×200 + b → b = 30.',
+      okT:'Full mastery!',okB:(b,m)=>'y = '+m+'x + '+Math.round(b)+'. Both cookies baked — Level 3 complete!'},
+  };
+
+  // ── Tutor SVG (tiny inline, reused across L3) ─────────────────
+  function TutorFace({size=40}){
+    const s=size/150;
+    return(<svg viewBox="0 0 150 200" width={size} height={size*1.33} style={{flexShrink:0}}>
+      <g transform={'translate(0,90) scale(1,1)'}>
+        <ellipse cx="75" cy="70" rx="60" ry="50" fill="#5F9EA0"/>
+        <ellipse cx="35" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(-10 35 15)"/>
+        <ellipse cx="115" cy="15" rx="8" ry="18" fill="#5F9EA0" transform="rotate(10 115 15)"/>
+        <ellipse cx="75" cy="80" rx="45" ry="38" fill="white"/>
+        <g transform="translate(0,25)">
+          <circle cx="50" cy="15" r="7" fill="black"/>
+          <circle cx="100" cy="15" r="7" fill="black"/>
+          <circle cx="51" cy="12" r="2.5" fill="white"/>
+          <circle cx="101" cy="12" r="2.5" fill="white"/>
+          <polygon points="75,20 70,14 80,14" fill="#2F4F4F"/>
+          <line x1="25" y1="20" x2="40" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/>
+          <line x1="25" y1="28" x2="40" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/>
+          <line x1="125" y1="20" x2="110" y2="21" stroke="#2F4F4F" strokeWidth="1.5"/>
+          <line x1="125" y1="28" x2="110" y2="25" stroke="#2F4F4F" strokeWidth="1.5"/>
+        </g>
+      </g>
+    </svg>);
+  }
+
+  // ── Socratic state evaluator ────────────────────────────────────
+// ── Socratic state evaluator ────────────────────────────────────
+  function evaluateSocraticState({attempts,blkCount,idleSeconds,mode}){
+    const len = attempts ? attempts.length : 0;
+    const last = len > 0 ? attempts[len-1] : null;
+    const prev = len > 1 ? attempts[len-2] : null;
+
+    // 1. Idle Trigger (Fires BEFORE they shoot, hence len <= 1)
+    if((mode==='pointslope'||mode==='slopeintercept') && idleSeconds >= 30 && len <= 1){
+      return{trigger:'real_world',
+        msg:"This equation might look abstract, but it's just a model. If you were predicting the cooling rate of an injection-molded part, m is how fast it cools and b is the starting temperature. What do x and y represent in that factory?"};
+    }
+
+    // If they haven't fired any shots yet, stop here.
+    if(!last) return null;
+
+    // 2. Wrong-Sign Trigger (Fires on any shot where they enter a positive slope for a downward target)
+    if(last.mEntered !== undefined && last.mEntered > 0 && last.cookieDy < 0){
+      return{trigger:'wrong_sign',
+        msg:"I notice the cookie is lower than where the beam starts, but the slope is positive — the beam goes upward. How do we represent 'going down' in rise-over-run?"};
+    }
+
+    // 3. Obstacle Blindness Trigger (Fires if they hit the garbage can 3 times without changing b)
+    if(blkCount >= 3 && attempts.filter(a => a.bChanged).length === 0){
+      return{trigger:'obstacle_blind',
+        msg:"That obstacle is sturdy! Changing the slope alone won't clear it. Is there a way to change where the beam starts vertically (the y-intercept)?"};
+    }
+
+    // 4. Over-Corrector Trigger (REQUIRES 2+ attempts to see if they are ping-ponging past the target)
+    if(prev && prev.angle !== undefined && last.angle !== undefined){
+      const target = last.targetAngle;
+      if(target !== undefined){
+        const e1 = prev.angle - target, e2 = last.angle - target;
+        // e1*e2 < 0 means they crossed over the target. Math.abs(e2) > Math.abs(e1)*1.3 means they overshot worse than last time.
+        if(e1 * e2 < 0 && Math.abs(e2) > Math.abs(e1) * 1.3){
+          return{trigger:'overcorrect',
+            msg:"You're bracketing the target — first you were a bit short, now a bit long. What if you split the difference between your last two shots?"};
+        }
+      }
+    }
+    
+    return null;
+  }
+
+  // ── Slope Keypad ───────────────────────────────────────────────
+  function SlopeKeypad({value,onChange,label='m =',disabled,maxVal=20,allowNeg=true}){
+    const[raw,setRaw]=useState(value!=null?String(value):'');
+    const[err,setErr]=useState('');
+    // Only sync display when an *external* change sets a new committed value
+    // (e.g. point-slope parser fills in b). Track last committed value to avoid
+    // overwriting what the user is actively typing.
+    const lastCommitted=useRef(value);
+    useEffect(()=>{
+      if(value!==lastCommitted.current){
+        lastCommitted.current=value;
+        setRaw(value!=null?String(value):'');
+      }
+    },[value]);
+    const parse=s=>{
+      const t=s.trim();
+      if(t.includes('/')){const[n,d]=t.split('/');const v=parseFloat(n)/parseFloat(d);return isNaN(v)?null:v;}
+      const v=parseFloat(t);return isNaN(v)?null:v;
+    };
+    const commit=()=>{
+      const v=parse(raw);
+      if(v===null){setErr('Enter a number or fraction like 2/3');return;}
+      if(!allowNeg&&v<0){setErr('Value must be ≥ 0');return;}
+      if(Math.abs(v)>maxVal){setErr(`Value must be between ${allowNeg?-maxVal:0} and ${maxVal}`);return;}
+      setErr('');
+      lastCommitted.current=v;
+      onChange(v);
+    };
+    return(<div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6,minWidth:220}}>
+      <div style={{fontSize:13,fontWeight:600,color:'#636366',letterSpacing:'.06em'}}>{label}</div>
+      <div style={{display:'flex',gap:8,alignItems:'center'}}>
+        <input value={raw} onChange={e=>{setRaw(e.target.value);setErr('');}}
+               onKeyDown={e=>e.key==='Enter'&&commit()}
+               disabled={disabled}
+               placeholder={label.includes('b')?"e.g. 30":"e.g. 1/2 or 0.5"}
+               style={{width:130,border:'1.5px solid '+(err?'#ff3b30':'#d1d1d6'),borderRadius:10,
+                       padding:'10px 13px',fontSize:16,fontFamily:'monospace',outline:'none',
+                       background:disabled?'#f9f9fb':'#fff',color:'#1c1c1e'}}/>
+        <button className="nbtn" onClick={commit} disabled={disabled}
+                style={{padding:'10px 18px',fontSize:15}}>Set</button>
+      </div>
+      {err&&<p style={{fontSize:13,color:'#ff3b30',margin:0}}>{err}</p>}
+    </div>);
+  }
+
+  // ── Canvas3: display + optional lift drag + optional slope-measure tool ──
+  // liftDrag=true: left-edge drag sets b (levels 3.1-3.3)
+  // liftDrag=false: b comes only from keypad (levels 3.4-3.6, b is algebraically computed)
+  function Canvas3({angle,b,onB,fired,baked,hits,cookies,obs,trees,showY,blocked,blkPt,enableMeasure,liftDrag}){
+    const svgRef=useRef(null),liftDragging=useRef(false);
+    const[dl,setDl]=useState(false);
+    const[mDrag,setMDrag]=useState(false);
+    const[mStart,setMStart]=useState(null);
+    const[mEnd,setMEnd]=useState(null);
+    const gp=useCallback((cx,cy)=>{
+      const svg=svgRef.current;if(!svg)return null;
+      const r=svg.getBoundingClientRect();
+      return{sx:(cx-r.left)*(CW/r.width),sy:(cy-r.top)*(CH/r.height)};
+    },[]);
+    const s2m=useCallback((sx,sy)=>({mx:sx-OX,my:OY-sy}),[]);
+    const dn=useCallback(e=>{
+      const p=e.touches?e.touches[0]:e,v=gp(p.clientX,p.clientY);if(!v)return;
+      if(liftDrag&&v.sx<OX+35){e.preventDefault();liftDragging.current=true;setDl(true);}
+      else if(enableMeasure){e.preventDefault();setMDrag(true);setMStart(v);setMEnd(v);}
+    },[gp,enableMeasure,liftDrag]);
+    const mv=useCallback(e=>{
+      const p=e.touches?e.touches[0]:e,v=gp(p.clientX,p.clientY);if(!v)return;
+      if(liftDragging.current){e.preventDefault();onB(Math.max(0,Math.min(300,OY-v.sy)));}
+      else if(mDrag){e.preventDefault();setMEnd(v);}
+    },[gp,onB,mDrag]);
+    const up=useCallback(()=>{liftDragging.current=false;setDl(false);setMDrag(false);},[]);
+    useEffect(()=>{
+      window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
+      window.addEventListener('touchmove',mv,{passive:false});window.addEventListener('touchend',up);
+      return()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);window.removeEventListener('touchmove',mv);window.removeEventListener('touchend',up);};
+    },[mv,up]);
+
+    const orig=m2s(0,b),ep=beamEnd(angle,b),fe=blocked&&blkPt?blkPt:ep;
+
+    // Slope triangle from measure drag
+    let mTriangle=null;
+    if(mStart&&mEnd&&(mDrag||(mStart.sx!==mEnd.sx||mStart.sy!==mEnd.sy))){
+      const mc=s2m(mEnd.sx,mEnd.sy),ms=s2m(mStart.sx,mStart.sy);
+      const dy=mc.my-ms.my,dx=mc.mx-ms.mx;
+      if(Math.abs(dx)>5){
+        const slope=(dy/dx);
+        const cornerSx=mEnd.sx,cornerSy=mStart.sy;
+        const offDy=dx>=0?18:-32;
+        const offDx=dy>=0?-18:18;
+        mTriangle=<g opacity=".95">
+          <polygon points={`${mStart.sx},${mStart.sy} ${mEnd.sx},${mEnd.sy} ${cornerSx},${cornerSy}`} fill="rgba(255,215,80,.18)"/>
+          <line x1={mEnd.sx} y1={mStart.sy} x2={mEnd.sx} y2={mEnd.sy} stroke="#34c759" strokeWidth="2.5" strokeDasharray="5 3"/>
+          <line x1={mStart.sx} y1={mStart.sy} x2={mEnd.sx} y2={mStart.sy} stroke="#0a84ff" strokeWidth="2.5" strokeDasharray="5 3"/>
+          <rect x={mEnd.sx+offDy-24} y={(mStart.sy+mEnd.sy)/2-10} width="50" height="20" rx="5" fill="#34c759"/>
+          <text x={mEnd.sx+offDy+1} y={(mStart.sy+mEnd.sy)/2+6} textAnchor="middle" fontSize="11" fill="white" fontWeight="700">Δy={Math.round(dy)}</text>
+          <rect x={(mStart.sx+mEnd.sx)/2-25} y={mStart.sy+offDx-10} width="50" height="20" rx="5" fill="#0a84ff"/>
+          <text x={(mStart.sx+mEnd.sx)/2} y={mStart.sy+offDx+6} textAnchor="middle" fontSize="11" fill="white" fontWeight="700">Δx={Math.round(dx)}</text>
+          <rect x={mEnd.sx+offDy-34} y={(mStart.sy+mEnd.sy)/2+16} width="70" height="20" rx="5" fill="#1c1c1e"/>
+          <text x={mEnd.sx+offDy+1} y={(mStart.sy+mEnd.sy)/2+30} textAnchor="middle" fontSize="11" fill="white" fontWeight="700">m={slope.toFixed(3)}</text>
+        </g>;
+      }
+    }
+
+    return(<div className="canvas-wrap">
+      <svg ref={svgRef} viewBox={'0 0 '+CW+' '+CH} className="gsvg"
+           style={{maxHeight:450,cursor:enableMeasure?'crosshair':'default'}} onMouseDown={dn} onTouchStart={dn}>
+        <ParkScene trees={trees} pfx="l3"/>
+        <Grid/>
+        {cookies.map(c=>{const p=m2s(c.mx,c.my);return(
+          <text key={'lbl'+c.id} x={p.x+18} y={p.y-14} fontSize="10" fill="#636366" fontFamily="monospace" fontWeight="600">({c.mx},{c.my})</text>
+        );})}
+
+        {showY&&b>0&&<line className="yline" x1={OX} y1={OY} x2={OX} y2={OY-b} stroke="#0a84ff" strokeWidth="5" strokeLinecap="round"/>}
+        {b>1&&<text x={OX+8} y={OY-b-6} fontSize="10" fill="#0a84ff" fontFamily="monospace" fontWeight="600">{'b='+Math.round(b)}</text>}
+        {obs.map((o,i)=><ParkBench key={i} {...o} blocked={blocked}/>)}
+        <ScissorLift b={b} ld={dl}/>
+        <line x1={orig.x} y1={orig.y} x2={ep.x} y2={ep.y} stroke="#0a84ff" strokeWidth="1.5" strokeDasharray="5 7" opacity=".55" style={{pointerEvents:'none'}}/>
+        <MaserSVG angle={angle} dragging={false} b={b}/>
+        {fired&&<line className="beam-line" x1={orig.x} y1={orig.y} x2={fe.x} y2={fe.y}
+                      stroke={blocked?'#ff9f0a':'#0a84ff'} strokeWidth="2.5" strokeLinecap="round" style={{pointerEvents:'none'}}/>}
+        {cookies.map(c=><CookieSVG key={c.id} mx={c.mx} my={c.my} baked={baked.has(c.id)} pop={hits.has(c.id)} showId={cookies.length>1} cid={'l3'+c.id}/>)}
+        {fired&&!blocked&&[...hits].map(id=>{const c=cookies.find(x=>x.id===id);return c?<Spark key={id} mx={c.mx} my={c.my}/>:null;})}
+        {mTriangle}
+        {enableMeasure&&!mDrag&&<text x={OX+20} y={20} fontSize="11" fill="#aeaeb2" fontFamily="monospace">drag between cookies to measure slope</text>}
+      </svg>
+    </div>);
+  }
+
+// Parse point-slope: y − y1 = m(x − x1) OR y - y1 = mx. Returns {m, b, x1, y1} or null.
+  function parsePointSlope(s){
+    const t=s.replace(/\s/g,'').toLowerCase();
+    // Updated Regex: makes the parentheses and the x-offset optional so "0.5x" works
+    const re=/^y([+-]\d+(?:\.\d+)?(?:\/\d+(?:\.\d+)?)?)?=([+-]?(?:\d+(?:\.\d+)?(?:\/\d+(?:\.\d+)?)?))(?:x|\(x([+-]\d+(?:\.\d+)?(?:\/\d+(?:\.\d+)?)?)?\))$/;
+    const m2=t.match(re);
+    if(!m2)return null;
+    const parseFrac=v=>{if(!v)return 0;if(v.includes('/')){const[n,d]=v.split('/');return parseFloat(n)/parseFloat(d);}return parseFloat(v);};
+    const y1=-parseFrac(m2[1]);   // sign flipped: "y-20" → group is "-20" → y1=20
+    const mNum=parseFrac(m2[2]);
+    const x1=-parseFrac(m2[3]);   // If they typed "0.5x", m2[3] is undefined, which parses to 0. Perfect!
+    if(isNaN(mNum))return null;
+    const b=y1-mNum*x1;
+    return{m:mNum,b,x1,y1};
+  }
+
+  // ── L3SubSec ────────────────────────────────────────────────────
+  function L3SubSec({subId,sRef,onDone,setLog}){
+    const data=L3S[subId];
+    const[angle,setAngle]=useState(Math.PI/8);
+    const[b,setB]=useState(0);
+    const[mInput,setMInput]=useState(null);  // numeric m from keypad
+    const[bInput,setBInput]=useState(null);  // numeric b for slopeintercept
+    const[dyInput,setDyInput]=useState('');  // scaffolded Δy entry
+    const[dxInput,setDxInput]=useState('');  // scaffolded Δx entry
+    const[psInput,setPsInput]=useState('');  // point-slope string
+    const[psErr,setPsErr]=useState('');
+    const[fired,setFired]=useState(false);
+    const[baked,setBaked]=useState(new Set());
+    const[hits,setHits]=useState(new Set());
+    const[att,setAtt]=useState(0);
+    const[blk,setBlk]=useState(false);
+    const[blkPt,setBlkPt]=useState(null);
+    const[ok,setOk]=useState(false);
+    const[agMsg,setAgMsg]=useState('');
+    const[blkCount,setBlkCount]=useState(0);
+    const[lastActive,setLastActive]=useState(Date.now());
+    const[idleSecs,setIdleSecs]=useState(0);
+    const attLog=useRef([]);
+    const done=useRef(false);
+    const vert=Math.abs(Math.abs(angle)-Math.PI/2)<.02;
+    const slope=vert?'∞':Math.tan(angle).toFixed(3);
+
+    // Idle timer for Socratic trigger
+    useEffect(()=>{
+      const iv=setInterval(()=>setIdleSecs(s=>s+1),1000);
+      return()=>clearInterval(iv);
+    },[]);
+    const resetIdle=()=>{setLastActive(Date.now());setIdleSecs(0);};
+
+    // When m keypad fires, set angle
+    const onMSet=useCallback(m=>{
+      setAngle(Math.atan(m));setMInput(m);resetIdle();
+      if(fired){setFired(false);setHits(new Set());setBlk(false);setAgMsg('');}
+    },[fired]);
+
+    // When b keypad fires, set b
+    const onBSet=useCallback(bv=>{
+      setB(bv);setBInput(bv);resetIdle();
+      if(fired){setFired(false);setHits(new Set());setBlk(false);setAgMsg('');}
+    },[fired]);
+
+    // Scaffold: compute m from Δy/Δx entries
+    const scaffoldM=()=>{
+      const dy=parseFloat(dyInput),dx=parseFloat(dxInput);
+      if(isNaN(dy)||isNaN(dx)||dx===0){setAgMsg('Enter valid numbers for Δy and Δx.');return;}
+      const m=dy/dx;
+      setAngle(Math.atan(m));setMInput(parseFloat(m.toFixed(4)));
+      setAgMsg('Computed m = '+dy+'/'+dx+' = '+m.toFixed(4)+'. Angle set! Now adjust the lift and fire.');
+    };
+
+    // Point-slope parse + apply
+    const applyPointSlope=()=>{
+      const res=parsePointSlope(psInput);
+      if(!res){setPsErr("Can't parse — try: y−20 = 0.5(x−0) or y−170 = 0.5(x−300)");return;}
+      // Validate: (x1,y1) must be one of the two cookies (within rounding tolerance)
+      const TOL=1.5;
+      const matchesCookie=data.cookies.some(c=>Math.abs(c.mx-res.x1)<TOL&&Math.abs(c.my-res.y1)<TOL);
+      if(!matchesCookie){
+        const opts=data.cookies.map(c=>`(${c.mx},${c.my})`).join(' or ');
+        setPsErr(`(${res.x1},${res.y1}) isn't one of the cookies. Use ${opts} as your (x₁,y₁).`);
+        return;
+      }
+      setPsErr('');
+      setAngle(Math.atan(res.m));setMInput(res.m);
+      setB(Math.max(0,Math.min(300,res.b)));setBInput(res.b);
+      setAgMsg('Parsed! m = '+res.m.toFixed(3)+', b = '+res.b.toFixed(1)+'. Hit Deploy to fire.');
+      resetIdle();
+    };
+
+    const ha=useCallback(a=>{
+      if(ok&&done.current)return;setAngle(a);setMInput(parseFloat(Math.tan(a).toFixed(3)));resetIdle();
+      if(fired){setFired(false);setHits(new Set());setBlk(false);setAgMsg('');}
+    },[fired,ok]);
+    const hb=useCallback(nb=>{
+      if(ok&&done.current)return;setB(nb);resetIdle();
+      if(fired){setFired(false);setHits(new Set());setBlk(false);setAgMsg('');}
+    },[fired,ok]);
+
+    const deploy=()=>{
+      const n=att+1;setAtt(n);setFired(true);resetIdle();
+      let isBlk=false,bp=null;
+      for(const o of(data.obs||[])){
+        if(beamBlocked(angle,b,o)){isBlk=true;bp=blockedPt(angle,b,o);break;}
+      }
+      // Log attempt
+      const cookieTarget=data.cookies[0];
+      const cookieDy=cookieTarget?cookieTarget.my-b:0;
+      const targetAngle=cookieTarget?Math.atan2(cookieTarget.my-b,cookieTarget.mx):0;
+      const aEntry={angle,mEntered:mInput,b,blocked:isBlk,bChanged:n>1&&Math.abs(b-(attLog.current[n-2]?.b||0))>2,cookieDy,targetAngle};
+      attLog.current.push(aEntry);
+      setLog(p=>({...p,answersLog:[...p.answersLog,{sec:'l3-'+subId,att:n,angle:(angle*180/Math.PI).toFixed(1),b:Math.round(b),blocked:isBlk}]}));
+      if(isBlk){
+        setBlkCount(c=>c+1);setBlk(true);setBlkPt(bp);setHits(new Set());
+        const soc=evaluateSocraticState({attempts:attLog.current,blkCount:blkCount+1,idleSeconds:idleSecs,mode:data.mode});
+        setAgMsg(soc?soc.msg:"Blocked! Raise the scissor lift to clear the obstacle.");
+        return;
+      }
+      setBlk(false);
+      const h=new Set();
+      data.cookies.forEach(c=>{if(rayHits(angle,c.mx,c.my,b))h.add(c.id);});
+      setHits(h);setBaked(p=>{const s=new Set(p);h.forEach(id=>s.add(id));return s;});
+      if(h.size===data.cookies.length&&!done.current){
+        done.current=true;setOk(true);
+        onDone();
+      } else if(h.size===0&&!isBlk){
+        const soc=evaluateSocraticState({attempts:attLog.current,blkCount,idleSeconds:idleSecs,mode:data.mode});
+        if(soc)setAgMsg(soc.msg);
+      }
+    };
+    const reset=()=>{setFired(false);setHits(new Set());setBlk(false);if(!done.current)setOk(false);setAgMsg('');};
+    const handleAskTotoro=()=>{
+      const soc=evaluateSocraticState({attempts:attLog.current,blkCount,idleSeconds:idleSecs,mode:data.mode});
+      setAgMsg(soc?soc.msg:data.hint);
+    };
+
+    const miss=fired&&hits.size===0&&!blk;
+    const partial=fired&&hits.size>0&&hits.size<data.cookies.length&&!blk;
+    const vert2=Math.abs(Math.abs(angle)-Math.PI/2)<.02;
+    const mDisplay=vert2?'∞':Math.tan(angle).toFixed(3);
+
+    // Idle Socratic nudge
+    useEffect(()=>{
+      if(idleSecs===30&&att<=1&&!ok){
+        const soc=evaluateSocraticState({attempts:attLog.current,blkCount,idleSeconds:30,mode:data.mode});
+        if(soc)setAgMsg(soc.msg);
+      }
+    },[idleSecs]);
+
+    return(<div ref={sRef} className="sec" style={{position:'relative'}}>
+      <div style={{textAlign:'center',marginBottom:20,width:'100%',maxWidth:700}}>
+        <div className="pill" style={{display:'inline-block',marginBottom:10}}>{data.pill}</div>
+        <h2 className="serif" style={{fontSize:'clamp(22px,4vw,38px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 8px',letterSpacing:'-.02em',lineHeight:1.15}}>{data.title}</h2>
+        <p style={{color:'#636366',fontSize:16,lineHeight:1.6,margin:'0 auto',maxWidth:500}}>{data.desc}</p>
+      </div>
+
+      {/* HUD */}
+      <div style={{marginBottom:14,display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center',alignItems:'center'}}>
+        <div className="hud">
+          <span style={{fontSize:14,color:'rgba(255,255,255,.5)',fontWeight:500}}>y =</span>
+          <span style={{fontSize:18,fontFamily:'Georgia,serif',color:'#fff',letterSpacing:'-.01em'}}>{mDisplay}x {b>=0?'+ '+Math.round(b):'− '+Math.round(-b)}</span>
+          <span style={{fontSize:14,color:'rgba(255,255,255,.4)'}}>m = {mDisplay}</span>
+        </div>
+      </div>
+
+      {/* Canvas */}
+      <Canvas3 angle={angle} b={b} onB={hb}
+               fired={fired} baked={baked} hits={hits}
+               cookies={data.cookies} obs={data.obs||[]} trees={data.trees||[]}
+               showY={b>0} blocked={blk} blkPt={blkPt}
+               enableMeasure={data.mode==='measure'}
+               liftDrag={data.liftDrag}/>
+
+      {/* Controls below canvas */}
+      <div style={{marginTop:16,width:'100%',maxWidth:680,display:'flex',flexDirection:'column',gap:14,alignItems:'center'}}>
+
+        {/* MODE: measure or compute — slope keypad */}
+        {(data.mode==='measure'||data.mode==='compute')&&<div className="wcard" style={{width:'100%',padding:'18px 22px'}}>
+          <div style={{fontSize:13,fontWeight:600,color:'#636366',letterSpacing:'.06em',marginBottom:12}}>
+            {data.mode==='measure'?'STEP 1: Drag between cookies to measure slope, then set m below':'STEP 1: Calculate m from the coordinates'}
+          </div>
+          {data.mode==='compute'&&<div style={{marginBottom:12,background:'#f0f4ff',borderRadius:10,padding:'10px 14px',fontFamily:'monospace',fontSize:14,color:'#3a3a3c'}}>
+            Cookie A = ({data.cookies[0].mx}, {data.cookies[0].my}), Cookie B = ({data.cookies[1]?.mx||'?'}, {data.cookies[1]?.my||'?'})
+            <br/>m = <Frac n={<>y<sub>B</sub>−y<sub>A</sub></>} d={<>x<sub>B</sub>−x<sub>A</sub></>} size={13}/>
+          </div>}
+          <SlopeKeypad value={mInput} onChange={onMSet} label="Enter m =" disabled={ok}/>
+          <div style={{marginTop:12,fontSize:13,color:'#aeaeb2'}}>{data.liftDrag?'⬆ Drag left side of canvas to set lift height (b)':'Enter b via the slope-intercept keypad below, or use point-slope form to compute it.'}</div>
+        </div>}
+
+        {/* MODE: scaffold Δy/Δx */}
+        {data.mode==='compute'&&data.cookies.length>=2&&!mInput&&<div className="icard" style={{width:'100%',padding:'16px 20px'}}>
+          <div style={{fontSize:13,fontWeight:600,color:'#4338ca',marginBottom:10}}>Need help? Compute Δy and Δx first:</div>
+          <div style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center'}}>
+            <div style={{display:'flex',flexDirection:'column',gap:4}}>
+              <label style={{fontSize:13,color:'#636366',fontWeight:500}}>Δy = y<sub>B</sub> − y<sub>A</sub></label>
+              <input value={dyInput} onChange={e=>setDyInput(e.target.value)} placeholder={data.cookies[1]?.my+' − '+data.cookies[0].my}
+                     style={{width:110,border:'1.5px solid #c7d2fe',borderRadius:8,padding:'8px 11px',fontSize:15,fontFamily:'monospace',outline:'none'}}/>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:4}}>
+              <label style={{fontSize:13,color:'#636366',fontWeight:500}}>Δx = x<sub>B</sub> − x<sub>A</sub></label>
+              <input value={dxInput} onChange={e=>setDxInput(e.target.value)} placeholder={data.cookies[1]?.mx+' − '+data.cookies[0].mx}
+                     style={{width:110,border:'1.5px solid #c7d2fe',borderRadius:8,padding:'8px 11px',fontSize:15,fontFamily:'monospace',outline:'none'}}/>
+            </div>
+            <button className="gbtn" style={{marginTop:18}} onClick={scaffoldM}>Compute m →</button>
+          </div>
+        </div>}
+
+        {/* MODE: point-slope */}
+        {data.mode==='pointslope'&&<div className="wcard" style={{width:'100%',padding:'18px 22px'}}>
+          <div style={{fontSize:13,fontWeight:600,color:'#636366',letterSpacing:'.06em',marginBottom:10}}>ENTER POINT-SLOPE EQUATION</div>
+          <div style={{background:'#f0f4ff',borderRadius:10,padding:'10px 14px',marginBottom:12,fontFamily:'monospace',fontSize:14,color:'#3a3a3c'}}>
+            Cookies: ({data.cookies[0].mx},{data.cookies[0].my}) &amp; ({data.cookies[1].mx},{data.cookies[1].my})
+          </div>
+          <div style={{fontSize:14,color:'#3a3a3c',marginBottom:8,lineHeight:1.6}}>
+            Use <strong>either</strong> cookie as (x₁,&nbsp;y₁). Both give the same line:
+            <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:6}}>
+              {data.cookies.map(c=><span key={c.id} style={{fontFamily:'monospace',fontSize:13,background:'#f0f4ff',borderRadius:6,padding:'3px 8px',color:'#4338ca'}}>
+                y−{c.my} = m(x−{c.mx})
+              </span>)}
+            </div>
+          </div>
+          <div style={{display:'flex',gap:8,alignItems:'flex-start',flexWrap:'wrap'}}>
+            <div style={{flex:1,minWidth:220}}>
+              <input value={psInput} onChange={e=>{setPsInput(e.target.value);setPsErr('');}}
+                     onKeyDown={e=>e.key==='Enter'&&applyPointSlope()}
+                     placeholder={`e.g. y−${data.cookies[0].my}=m(x−${data.cookies[0].mx}) or y−${data.cookies[1]?.my}=m(x−${data.cookies[1]?.mx})`}
+                     style={{width:'100%',border:'1.5px solid '+(psErr?'#ff3b30':'#d1d1d6'),borderRadius:10,padding:'11px 14px',fontSize:15,fontFamily:'monospace',outline:'none',boxSizing:'border-box'}}/>
+              {psErr&&<p style={{fontSize:13,color:'#ff3b30',margin:'4px 0 0'}}>{psErr}</p>}
+            </div>
+            <button className="nbtn" onClick={applyPointSlope} style={{padding:'11px 20px',fontSize:15,flexShrink:0}}>Parse &rarr;</button>
+          </div>
+          <p style={{fontSize:13,color:'#aeaeb2',marginTop:8}}>After parsing, Deploy to fire.</p>
+        </div>}
+
+        {/* MODE: slope-intercept */}
+        {data.mode==='slopeintercept'&&<div className="wcard" style={{width:'100%',padding:'18px 22px'}}>
+          <div style={{fontSize:13,fontWeight:600,color:'#636366',letterSpacing:'.06em',marginBottom:12}}>ENTER y = mx + b</div>
+          <div style={{background:'#f0f4ff',borderRadius:10,padding:'10px 14px',marginBottom:12,fontFamily:'monospace',fontSize:14,color:'#3a3a3c'}}>
+            Cookies: {data.cookies.map(c=>'('+c.mx+','+c.my+')').join(' & ')}
+          </div>
+          <div style={{display:'flex',gap:20,flexWrap:'wrap',justifyContent:'center'}}>
+            <SlopeKeypad value={mInput} onChange={onMSet} label="m =" disabled={ok}/>
+            <SlopeKeypad value={bInput} onChange={onBSet} label="b =" disabled={ok} maxVal={300} allowNeg={false}/>
+          </div>
+          <p style={{fontSize:13,color:'#aeaeb2',marginTop:10,textAlign:'center'}}>
+            Compute m first, then plug a known point into y = mx + b and solve for b.
+          </p>
+        </div>}
+
+        {/* Action buttons */}
+        <div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
+          {!ok&&<button className="dbtn" onClick={deploy} disabled={fired&&!blk&&!miss&&!partial}>⚡ Deploy Beam</button>}
+          {fired&&!ok&&<button className="gbtn" onClick={reset}>Reset</button>}
+        </div>
+        {att>0&&!ok&&<div style={{fontSize:13,color:'#c7c7cc',marginTop:4}}>{att+' attempt'+(att!==1?'s':'')}</div>}
+
+        {/* Feedback cards */}
+        {!fired&&!ok&&att===0&&<div className="hcard">💡 {data.hint}</div>}
+        {blk&&<div className="blkcard fup"><div style={{fontSize:20,marginBottom:5}}>🚧 Blocked!</div><div style={{color:'#636366',fontSize:15}}>Beam hit the obstacle. Raise the lift!{att>=data.hintAfter&&<span style={{color:'#8e8e93'}}> Lift above height {data.obs[0]?.height}.</span>}</div></div>}
+        {miss&&<div className="mcard fup"><div style={{fontSize:20,marginBottom:5}}>🎯 Miss</div><div style={{color:'#636366',fontSize:15,lineHeight:1.5}}>The beam didn't reach the cookie. Check your m and b values.{att>=data.hintAfter&&<><br/><span style={{color:'#8e8e93'}}>{data.hint}</span></>}</div></div>}
+        {partial&&<div className="pcard fup"><div style={{fontSize:20,marginBottom:5}}>🎯 Partial ({hits.size}/{data.cookies.length})</div><div style={{color:'#636366',fontSize:15}}>Hit some — adjust m or b to pass through all cookies.</div></div>}
+        {ok&&<div className="scard fup"><div style={{fontSize:24,marginBottom:6}}>🍪✨</div><div style={{fontWeight:600,fontSize:15,color:'#1c5c35',marginBottom:6}}>{data.okT}</div><div style={{color:'#2d7a4b',fontSize:15,lineHeight:1.6}}>{data.okB(b,mDisplay)}</div></div>}
+
+        {/* Socratic agent message */}
+        {agMsg&&<div className="fup" style={{marginTop:4,display:'flex',gap:12,alignItems:'flex-start',width:'100%',maxWidth:520,background:'#f0f4ff',borderRadius:14,padding:'14px 16px',border:'1.5px solid #c7d2fe'}}>
+          <TutorFace size={44}/>
+          <div style={{fontSize:15,color:'#3a3a3c',lineHeight:1.65,flex:1}}>{agMsg}</div>
+          <button onClick={()=>setAgMsg('')} style={{background:'none',border:'none',cursor:'pointer',fontSize:17,color:'#aeaeb2',padding:'0 4px',lineHeight:1,flexShrink:0}}>×</button>
+        </div>}
+      </div>
+      <Agent msg={agMsg} setMsg={setAgMsg} onAsk={handleAskTotoro}/>
+    </div>);
+  }
+
+  // ════════════════ LEVEL 3 TEACHING MOMENT: Point-Slope Form ════
+  function L3TeachSec({sRef,onDone}){
+    // Two example cookies matching 3.4
+    const CA={mx:0,my:20},CB={mx:300,my:170};
+    const m=0.5,b=20;
+    // Which point the student is currently viewing: 'A' or 'B'
+    const[active,setActive]=useState('A');
+    const[step,setStep]=useState(0); // 0=intro, 1=point chosen, 2=both shown, 3=ready
+    const done=useRef(false);
+
+    const pt=active==='A'?CA:CB;
+    const otherPt=active==='A'?CB:CA;
+    const otherLabel=active==='A'?'B':'A';
+
+    // SVG mini-graph constants
+    const GX=50,GY=160,SX=0.55,SY=0.55;
+    const tg=(mx,my)=>({x:GX+mx*SX, y:GY-my*SY});
+    const lineStart=tg(0,b);
+    const lineEnd=tg(500,m*500+b);
+    const ptSvg=tg(pt.mx,pt.my);
+    const otherSvg=tg(otherPt.mx,otherPt.my);
+
+    // y-sign display helper: y - (+20) → "y − 20", y - (-5) → "y + 5"
+    const showY1=(y1)=>y1===0?'y':(y1>0?`y − ${y1}`:`y + ${Math.abs(y1)}`);
+    const showX1=(x1)=>x1===0?'x':(x1>0?`x − ${x1}`:`x + ${Math.abs(x1)}`);
+
+    return(<div ref={sRef} className="sec secctr">
+      <div style={{maxWidth:620,width:'100%',display:'flex',flexDirection:'column',alignItems:'center',gap:24}}>
+
+        {/* Header */}
+        <div style={{textAlign:'center'}}>
+          <div className="pill" style={{display:'inline-block',marginBottom:10}}>Level 3 · Point-Slope Form</div>
+          <h2 className="serif" style={{fontSize:'clamp(22px,4vw,38px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 10px',letterSpacing:'-.02em'}}>The Equation of a Line</h2>
+          <p style={{color:'#636366',fontSize:16,lineHeight:1.65,margin:0}}>
+            If a point <strong>(x₁, y₁)</strong> lies on a line with slope <strong>m</strong>, then <em>every</em> other point (x, y) on that line satisfies:
+          </p>
+        </div>
+
+        {/* Formula display */}
+        <div style={{background:'linear-gradient(135deg,#f0f4ff,#e8eeff)',border:'1.5px solid #c7d2fe',
+                     borderRadius:18,padding:'20px 32px',textAlign:'center',width:'100%'}}>
+          <div style={{fontSize:22,fontFamily:'Georgia,serif',color:'#1c1c1e',letterSpacing:'.01em',lineHeight:1.6}}>
+            <span style={{color:'#636366',fontSize:16,display:'block',marginBottom:6,fontFamily:'system-ui'}}>point-slope form</span>
+            <span style={{color:'#34c759',fontWeight:700}}>{showY1(pt.my)}</span>
+            <span style={{color:'#1c1c1e'}}> = </span>
+            <span style={{color:'#0a84ff',fontWeight:700}}>m</span>
+            <span style={{color:'#1c1c1e'}}> · (</span>
+            <span style={{color:'#ff9f0a',fontWeight:700}}>{showX1(pt.mx)}</span>
+            <span style={{color:'#1c1c1e'}}>)</span>
+          </div>
+          <div style={{marginTop:10,fontSize:15,color:'#636366',fontFamily:'monospace'}}>
+            with <span style={{color:'#0a84ff',fontWeight:600}}>m = {m}</span> and point&nbsp;
+            <span style={{color:active==='A'?'#34c759':'#ff9f0a',fontWeight:600}}>
+              ({pt.mx}, {pt.my})
+            </span>
+            {' → '}
+            <span style={{color:'#636366'}}>
+              {showY1(pt.my)} = {m}({showX1(pt.mx)})
+            </span>
+          </div>
+          {/* Show solved b */}
+          <div style={{marginTop:8,fontSize:14,color:'#8e8e93',fontFamily:'monospace'}}>
+            solve for y: y = {m}x + <span style={{color:'#ff3b30',fontWeight:600}}>{b}</span>
+            {' '}→ b = {b} ✓
+          </div>
+        </div>
+
+        {/* Interactive: pick which point */}
+        <div style={{width:'100%',background:'#f9f9fb',borderRadius:16,border:'1.5px solid #e5e5ea',padding:'18px 22px'}}>
+          <div style={{fontSize:13,fontWeight:600,color:'#8e8e93',letterSpacing:'.07em',marginBottom:12}}>
+            THE KEY INSIGHT — EITHER POINT WORKS
+          </div>
+          <p style={{fontSize:15,color:'#3a3a3c',lineHeight:1.6,margin:'0 0 14px'}}>
+            Two cookies sit on the same line. You can write the equation using <strong>either</strong> one as (x₁, y₁). Both give the same line.
+          </p>
+          <div style={{display:'flex',gap:10,justifyContent:'center',marginBottom:16}}>
+            {['A','B'].map(lbl=>{
+              const p=lbl==='A'?CA:CB;
+              const isActive=active===lbl;
+              return(<button key={lbl} onClick={()=>{setActive(lbl);setStep(s=>Math.max(s,1));}}
+                style={{padding:'10px 24px',borderRadius:12,border:'2px solid',fontSize:15,fontWeight:600,cursor:'pointer',
+                        borderColor:isActive?'#0a84ff':'#d1d1d6',
+                        background:isActive?'#0a84ff':'#fff',
+                        color:isActive?'#fff':'#636366',transition:'all .2s'}}>
+                Cookie {lbl} = ({p.mx}, {p.my})
+              </button>);
+            })}
+          </div>
+
+          {/* Mini SVG graph */}
+          <svg viewBox="0 0 340 180" style={{width:'100%',maxWidth:400,display:'block',margin:'0 auto',borderRadius:10,background:'#fff',border:'1px solid #f2f2f7'}}>
+            {/* Axes */}
+            <line x1={GX} y1={10} x2={GX} y2={GY+5} stroke="#e5e5ea" strokeWidth="1.5"/>
+            <line x1={GX-5} y1={GY} x2={320} y2={GY} stroke="#e5e5ea" strokeWidth="1.5"/>
+            {/* Grid lines every 100 math units */}
+            {[100,200,300,400].map(mx=><line key={mx} x1={tg(mx,0).x} y1={10} x2={tg(mx,0).x} y2={GY} stroke="#f2f2f7" strokeWidth="1"/>)}
+            {[50,100,150].map(my=><line key={my} x1={GX} y1={tg(0,my).y} x2={320} y2={tg(0,my).y} stroke="#f2f2f7" strokeWidth="1"/>)}
+            {/* The line */}
+            <line x1={lineStart.x} y1={lineStart.y} x2={lineEnd.x} y2={lineEnd.y} stroke="#0a84ff" strokeWidth="2" opacity=".7"/>
+            {/* Rise/run triangle to active point */}
+            {step>=1&&<>
+              <line x1={tg(0,b).x} y1={tg(0,b).y} x2={ptSvg.x} y2={tg(0,b).y} stroke="#ff9f0a" strokeWidth="1.5" strokeDasharray="4 3"/>
+              <line x1={ptSvg.x} y1={tg(0,b).y} x2={ptSvg.x} y2={ptSvg.y} stroke="#34c759" strokeWidth="1.5" strokeDasharray="4 3"/>
+            </>}
+            {/* Other cookie (dimmed) */}
+            <circle cx={otherSvg.x} cy={otherSvg.y} r="7" fill="#f5deb3" stroke="#c4a35a" strokeWidth="1.5" opacity=".5"/>
+            <text x={otherSvg.x+9} y={otherSvg.y-7} fontSize="9" fill="#aeaeb2" fontFamily="monospace">{otherLabel}</text>
+            {/* Active cookie */}
+            <circle cx={ptSvg.x} cy={ptSvg.y} r="9" fill="#f5deb3" stroke="#c4a35a" strokeWidth="2"/>
+            <text x={ptSvg.x+11} y={ptSvg.y-8} fontSize="9" fill="#3a3a3c" fontFamily="monospace" fontWeight="700">{active} ({pt.mx},{pt.my})</text>
+            {/* b marker */}
+            <circle cx={lineStart.x} cy={lineStart.y} r="4" fill="#ff3b30" opacity=".7"/>
+            <text x={lineStart.x+6} y={lineStart.y+4} fontSize="9" fill="#ff3b30" fontFamily="monospace">b={b}</text>
+            {/* Axis labels */}
+            <text x={315} y={GY+14} fontSize="9" fill="#aeaeb2" fontFamily="monospace">x</text>
+            <text x={GX-14} y={14} fontSize="9" fill="#aeaeb2" fontFamily="monospace">y</text>
+          </svg>
+
+          {step>=1&&<div style={{marginTop:14,background:'#f0f9ff',border:'1.5px solid #bae6fd',borderRadius:10,padding:'12px 16px',fontSize:14,color:'#0369a1',lineHeight:1.6}}>
+            Using <strong>Cookie {active} = ({pt.mx}, {pt.my})</strong>:<br/>
+            <span style={{fontFamily:'monospace'}}>{showY1(pt.my)} = {m}·({showX1(pt.mx)})</span><br/>
+            Rearranges to: <span style={{fontFamily:'monospace',color:'#0a84ff',fontWeight:600}}>y = {m}x + {b}</span>
+            {step>=1&&active==='A'&&<span style={{color:'#636366'}}> — try Cookie B now!</span>}
+            {step>=1&&active==='B'&&<span style={{color:'#34c759',fontWeight:600}}> ✓ Same line!</span>}
+          </div>}
+        </div>
+
+        {/* Summary callout */}
+        <div style={{background:'linear-gradient(135deg,#ecfdf5,#d1fae5)',border:'1.5px solid #6ee7b7',borderRadius:14,padding:'16px 20px',width:'100%'}}>
+          <div style={{fontSize:13,fontWeight:700,color:'#065f46',letterSpacing:'.06em',marginBottom:6}}>TAKEAWAY</div>
+          <p style={{fontSize:15,color:'#064e3b',lineHeight:1.65,margin:0}}>
+            <strong>y − y₁ = m(x − x₁)</strong> works with <em>any</em> point on the line. Different choices of (x₁, y₁) give equations that look different but describe the <em>same line</em> — they all simplify to the same y&nbsp;=&nbsp;mx&nbsp;+&nbsp;b.
+          </p>
+        </div>
+
+        <button className="dbtn" onClick={()=>{if(!done.current){done.current=true;onDone();}}}
+                style={{fontSize:17,padding:'14px 40px'}}>
+          Got it — let me try! →
+        </button>
+      </div>
+    </div>);
+  }
+
+  // ══════════════════════ LEVEL 4: FINAL CHALLENGE ═══════════════
+  // 4 cookies on 2 lines. 2 shots, text entry only, no drag.
+  // Cookies: A(100,250)  B(500,50)  C(500,200)  D(650,200)
+  //   Line1: A+B  y = -0.5x + 300   (m=-1/2, b=300)
+  //   Line2: C+D  y = 200            (m=0,    b=200)
+  //   B & C share x=500 (the vertical-line hint)
+  //   Wrong split A+D|B+C: B+C is vertical — impossible from maser
+  //   Wrong split A+C|B+D: B+D needs b=-450 — impossible
+  // => Unique valid solution.
+
+  const L4_COOKIES=[
+    {id:'A',mx:100,my:250},
+    {id:'B',mx:500,my:50},
+    {id:'C',mx:500,my:200},
+    {id:'D',mx:650,my:200},
+  ];
+  // Solution lines
+  const L4_LINES=[
+    {m:-0.5,b:300,ids:['A','B']},
+    {m:0,   b:200,ids:['C','D']},
+  ];
+
+  // Canvas for Level 4 — shows all 4 cookies, two independent beam lines
+  function Canvas4({shot1,shot2,baked,hits1,hits2,fired1,fired2}){
+    // Render both beams on same canvas
+    const beam=(m,b,fired,hitIds,color)=>{
+      const angle=Math.atan(m);
+      const orig=m2s(0,b),ep=beamEnd(angle,b);
+      return fired?<line key={color} className="beam-line" x1={orig.x} y1={orig.y} x2={ep.x} y2={ep.y}
+        stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{pointerEvents:'none'}}/> : null;
+    };
+    const guide=(m,b,color)=>{
+      const angle=Math.atan(m);
+      const orig=m2s(0,b),ep=beamEnd(angle,b);
+      return<line x1={orig.x} y1={orig.y} x2={ep.x} y2={ep.y}
+        stroke={color} strokeWidth="1.5" strokeDasharray="5 7" opacity=".45" style={{pointerEvents:'none'}}/>;
+    };
+    return(<div className="canvas-wrap">
+      <svg viewBox={'0 0 '+CW+' '+CH} className="gsvg" style={{maxHeight:450}}>
+        <ParkScene trees={[]} pfx="l4"/>
+        <Grid/>
+        {/* coordinate labels on all cookies */}
+        {L4_COOKIES.map(c=>{const p=m2s(c.mx,c.my);return(
+          <text key={'lbl'+c.id} x={p.x+(c.id==='A'?-52:14)} y={p.y+(c.id==='B'?18:-10)}
+                fontSize="10" fill="#636366" fontFamily="monospace" fontWeight="600">({c.mx},{c.my})</text>
+        );})}
+        {/* dashed guides once angles are known */}
+        {shot1.ready&&guide(shot1.m,shot1.b,'#0a84ff')}
+        {shot2.ready&&guide(shot2.m,shot2.b,'#ff9f0a')}
+        {/* maser icons */}
+        {shot1.ready&&<MaserSVG angle={Math.atan(shot1.m)} dragging={false} b={shot1.b}/>}
+        {/* fired beams */}
+        {beam(shot1.m,shot1.b,fired1,hits1,'#0a84ff')}
+        {beam(shot2.m,shot2.b,fired2,hits2,'#ff9f0a')}
+        {/* cookies */}
+        {L4_COOKIES.map(c=><CookieSVG key={c.id} mx={c.mx} my={c.my}
+          baked={baked.has(c.id)} pop={hits1.has(c.id)||hits2.has(c.id)}
+          showId={true} cid={'l4'+c.id}/>)}
+        {/* sparks */}
+        {fired1&&[...hits1].map(id=>{const c=L4_COOKIES.find(x=>x.id===id);return c?<Spark key={id+'1'} mx={c.mx} my={c.my}/>:null;})}
+        {fired2&&[...hits2].map(id=>{const c=L4_COOKIES.find(x=>x.id===id);return c?<Spark key={id+'2'} mx={c.mx} my={c.my}/>:null;})}
+      </svg>
+    </div>);
+  }
+
+  function L4FinalSec({sRef,onDone,setLog}){
+    const TOLS=0.015; // slope tolerance
+    const TOLB=2;     // b tolerance
+    // shot state: {m,b,ready} for each of 2 shots
+    const[s1,setS1]=useState({m:null,b:null,ready:false});
+    const[s2,setS2]=useState({m:null,b:null,ready:false});
+    // Which shot is being entered: 1 or 2
+    const[active,setActive]=useState(1);
+    const[fired1,setFired1]=useState(false);
+    const[fired2,setFired2]=useState(false);
+    const[hits1,setHits1]=useState(new Set());
+    const[hits2,setHits2]=useState(new Set());
+    const[baked,setBaked]=useState(new Set());
+    const[att,setAtt]=useState(0);
+    const[msg,setMsg]=useState('');
+    const[msgColor,setMsgColor]=useState('#3a3a3c');
+    const[ok,setOk]=useState(false);
+    const done=useRef(false);
+
+    // Per-shot keypad state
+    const[m1raw,setM1raw]=useState('');
+    const[b1raw,setB1raw]=useState('');
+    const[m2raw,setM2raw]=useState('');
+    const[b2raw,setB2raw]=useState('');
+    const[err1,setErr1]=useState('');
+    const[err2,setErr2]=useState('');
+
+    const parseFrac=s=>{
+      const t=s.trim();
+      if(!t)return null;
+      if(t.includes('/')){const[n,d]=t.split('/');const v=parseFloat(n)/parseFloat(d);return isNaN(v)?null:v;}
+      const v=parseFloat(t);return isNaN(v)?null:v;
+    };
+
+    const commitShot=(shotNum)=>{
+      const mraw=shotNum===1?m1raw:m2raw;
+      const braw=shotNum===1?b1raw:b2raw;
+      const setErr=shotNum===1?setErr1:setErr2;
+      const m=parseFrac(mraw), b=parseFrac(braw);
+      if(m===null){setErr('Enter a slope m (e.g. -1/2 or 0)');return;}
+      if(b===null){setErr('Enter a y-intercept b (e.g. 300)');return;}
+      if(b<0||b>300){setErr('b must be between 0 and 300 (lift range)');return;}
+      setErr('');
+      if(shotNum===1)setS1({m,b,ready:true});
+      else setS2({m,b,ready:true});
+      setMsg('');
+    };
+
+    const fireShot=(shotNum, overrideM, overrideB)=>{
+      const mVal = overrideM !== undefined ? overrideM : (shotNum===1?s1.m:s2.m);
+      const bVal = overrideB !== undefined ? overrideB : (shotNum===1?s1.b:s2.b);
+      if(mVal===null||bVal===null){setMsg('Set m and b for Shot '+shotNum+' first.');setMsgColor('#ff3b30');return;}
+      const angle=Math.atan(mVal);
+      const newHits=new Set();
+      L4_COOKIES.forEach(c=>{
+        if(!baked.has(c.id)&&rayHits(angle,c.mx,c.my,bVal))newHits.add(c.id);
+      });
+      if(shotNum===1){setFired1(true);setHits1(newHits);}
+      else{setFired2(true);setHits2(newHits);}
+      const newBaked=new Set([...baked,...newHits]);
+      setBaked(newBaked);
+      setAtt(a=>a+1);
+
+      if(newBaked.size===4){
+        setOk(true);
+        setMsg('🎉 All four cookies baked in '+(att+1)+' shot'+(att===0?'':'s')+'! Perfect precision!');
+        setMsgColor('#34c759');
+        if(!done.current){done.current=true;onDone();};
+      } else if(shotNum===2||(shotNum===1&&newHits.size===0&&att>=1)){
+        const remaining=4-newBaked.size;
+        if(remaining>0){
+          setMsg(newHits.size===0?'Missed — check your equation. Reset and try again.'
+            :'Got '+newHits.size+' cookie'+(newHits.size>1?'s':'')+'! '+(4-newBaked.size)+' remaining.');
+          setMsgColor(newHits.size>0?'#ff9f0a':'#ff3b30');
+        }
+      } else if(newHits.size>0){
+        setMsg('Shot 1: baked '+newHits.size+' cookie'+(newHits.size>1?'s':'')+'! Now set up Shot 2.');
+        setMsgColor('#0a84ff');
+        setActive(2);
+      } else {
+        setMsg('Shot 1 missed. You still have Shot 2 — or reset to try again.');
+        setMsgColor('#ff9f0a');
+      }
+    };
+
+    const reset=()=>{
+      setS1({m:null,b:null,ready:false});setS2({m:null,b:null,ready:false});
+      setFired1(false);setFired2(false);
+      setHits1(new Set());setHits2(new Set());
+      setBaked(new Set());setAtt(0);setMsg('');
+      setM1raw('');setB1raw('');setM2raw('');setB2raw('');
+      setErr1('');setErr2('');setActive(1);
+    };
+
+    const shotPanel=(num)=>{
+      const isActive=active===num;
+      const mraw=num===1?m1raw:m2raw;
+      const braw=num===1?b1raw:b2raw;
+      const setMraw=num===1?setM1raw:setM2raw;
+      const setBraw=num===1?setB1raw:setB2raw;
+      const err=num===1?err1:err2;
+      const shot=num===1?s1:s2;
+      const fired=num===1?fired1:fired2;
+      const hits=num===1?hits1:hits2;
+      const color=num===1?'#0a84ff':'#ff9f0a';
+      const locked=num===2&&!fired1&&!s1.ready; // can't set shot 2 until shot 1 is ready
+
+      return(<div style={{flex:1,minWidth:240,padding:'16px 18px',borderRadius:14,
+                          border:'2px solid '+(isActive?color:'#e5e5ea'),
+                          background:isActive?'#fafbff':'#f9f9fb',
+                          opacity:locked?0.45:1,
+                          transition:'border-color .2s, background .2s'}}>
+        <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
+          <div style={{width:10,height:10,borderRadius:'50%',background:color,flexShrink:0}}/>
+          <span style={{fontSize:13,fontWeight:700,color,letterSpacing:'.06em'}}>SHOT {num}</span>
+          {fired&&<span style={{fontSize:12,color:'#8e8e93',marginLeft:'auto'}}>
+            {hits.size>0?'✓ '+hits.size+' hit':'✗ missed'}
+          </span>}
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <label style={{fontSize:13,color:'#636366',fontWeight:600,width:24,flexShrink:0}}>m =</label>
+            <input value={mraw} onChange={e=>{setMraw(e.target.value);if(num===1)setErr1('');else setErr2('');}}
+                   onKeyDown={e=>e.key==='Enter'&&commitShot(num)}
+                   disabled={ok||locked}
+                   placeholder="e.g. −1/2"
+                   style={{flex:1,border:'1.5px solid '+(err&&!mraw?'#ff3b30':'#d1d1d6'),borderRadius:8,
+                           padding:'9px 11px',fontSize:15,fontFamily:'monospace',outline:'none',
+                           background:ok||locked?'#f2f2f7':'#fff'}}/>
+          </div>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <label style={{fontSize:13,color:'#636366',fontWeight:600,width:24,flexShrink:0}}>b =</label>
+            <input value={braw} onChange={e=>{setBraw(e.target.value);if(num===1)setErr1('');else setErr2('');}}
+                   onKeyDown={e=>e.key==='Enter'&&commitShot(num)}
+                   disabled={ok||locked}
+                   placeholder="e.g. 300"
+                   style={{flex:1,border:'1.5px solid '+(err&&!braw?'#ff3b30':'#d1d1d6'),borderRadius:8,
+                           padding:'9px 11px',fontSize:15,fontFamily:'monospace',outline:'none',
+                           background:ok||locked?'#f2f2f7':'#fff'}}/>
+          </div>
+          {err&&<p style={{fontSize:12,color:'#ff3b30',margin:0}}>{err}</p>}
+          {!fired&&!ok&&<div style={{display:'flex',gap:8,marginTop:4}}>
+            <button className="nbtn" onClick={()=>{setActive(num);commitShot(num);}} disabled={ok||locked}
+                    style={{flex:1,padding:'9px 0',fontSize:14}}>Set Line {num}</button>
+            <button className="dbtn" onClick={()=>{
+              setActive(num);
+              const mVal=parseFrac(num===1?m1raw:m2raw);
+              const bVal=parseFrac(num===1?b1raw:b2raw);
+              const setErr=num===1?setErr1:setErr2;
+              if(mVal===null){setErr('Enter slope m');return;}
+              if(bVal===null){setErr('Enter y-intercept b');return;}
+              if(bVal<0||bVal>300){setErr('b must be 0–300');return;}
+              setErr('');
+              if(num===1)setS1({m:mVal,b:bVal,ready:true});
+              else setS2({m:mVal,b:bVal,ready:true});
+              fireShot(num,mVal,bVal);
+            }} disabled={ok||locked}
+                    style={{flex:1,padding:'9px 0',fontSize:14}}>Fire ⚡</button>
+          </div>}
+          {shot.ready&&!fired&&<div style={{fontSize:12,color:'#8e8e93',fontFamily:'monospace',marginTop:2}}>
+            y = {shot.m}x {shot.b>=0?'+ '+shot.b:'− '+Math.abs(shot.b)} — ready to fire
+          </div>}
+        </div>
+      </div>);
+    };
+
+    return(<div ref={sRef} className="sec" style={{position:'relative'}}>
+      <div style={{textAlign:'center',marginBottom:20,maxWidth:700,width:'100%'}}>
+        <div className="pill" style={{display:'inline-block',marginBottom:10}}>Level 4 · Final Challenge</div>
+        <h2 className="serif" style={{fontSize:'clamp(22px,4vw,38px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 10px',letterSpacing:'-.02em'}}>Four Cookies, Two Shots</h2>
+        <p style={{color:'#636366',fontSize:16,lineHeight:1.65,margin:0}}>
+          Four cookies. Two separate lines. No dragging — pure algebra. Figure out which cookies share a line, find m and b for each, and bake them all in exactly 2 shots.
+        </p>
+      </div>
+
+      {/* Hint callout */}
+      <div style={{background:'#fffbeb',border:'1.5px solid #fde68a',borderRadius:12,padding:'12px 18px',
+                   marginBottom:16,maxWidth:620,width:'100%',fontSize:14,color:'#92400e',lineHeight:1.6}}>
+        <strong>Hint:</strong> Two cookies share the same x-coordinate. A vertical line through them can't be fired from the maser — so they must lie on <em>different</em> lines.
+        Not all pairings produce a beam that fits within the window's constraints.
+      </div>
+
+      <Canvas4 shot1={s1} shot2={s2} baked={baked} hits1={hits1} hits2={hits2} fired1={fired1} fired2={fired2}/>
+
+      {/* Shot panels */}
+      <div style={{display:'flex',gap:14,flexWrap:'wrap',width:'100%',maxWidth:620,marginTop:16,justifyContent:'center'}}>
+        {shotPanel(1)}
+        {shotPanel(2)}
+      </div>
+
+      {/* Feedback */}
+      {msg&&<div style={{marginTop:14,padding:'12px 20px',borderRadius:12,background:msgColor==='#34c759'?'#ecfdf5':msgColor==='#ff3b30'?'#fff1f2':'#f0f9ff',
+                         border:'1.5px solid '+(msgColor==='#34c759'?'#86efac':msgColor==='#ff3b30'?'#fecaca':'#bae6fd'),
+                         fontSize:15,color:msgColor,fontWeight:500,maxWidth:560,textAlign:'center'}}>
+        {msg}
+      </div>}
+
+      {/* Attempts + reset */}
+      {att>0&&!ok&&<div style={{display:'flex',gap:12,alignItems:'center',marginTop:12}}>
+        <span style={{fontSize:13,color:'#c7c7cc'}}>{att} shot{att!==1?'s':''} fired</span>
+        <button className="gbtn" onClick={reset} style={{fontSize:14,padding:'8px 18px'}}>Reset</button>
+      </div>}
+    </div>);
+  }
+
+  function ProgBar({done,total}){
+    const p=Math.round(done/Math.max(total,1)*100);
+    return(<div style={{position:'fixed',top:0,left:0,width:'100%',zIndex:100,height:3,background:'#f2f2f7'}}>
+      <div style={{height:'100%',borderRadius:'0 2px 2px 0',background:'linear-gradient(90deg,#0a84ff,#34aadc)',width:p+'%',transition:'width .6s ease-out'}}/>
+    </div>);
+  }
+
+  function DoneSec({sRef}){
+    return(<div ref={sRef} className="sec secctr">
+      <div style={{textAlign:'center',maxWidth:540}}>
+        <div style={{fontSize:64,marginBottom:20}}>🍪</div>
+        <h2 className="serif" style={{fontSize:'clamp(28px,5vw,48px)',fontWeight:400,color:'#1c1c1e',margin:'0 0 16px',letterSpacing:'-.02em'}}>Levels 1–4 Complete!</h2>
+        <p style={{color:'#636366',fontSize:16,lineHeight:1.65,margin:'0 0 32px'}}>You've mastered slope intuition, the y-intercept, negative slope, algebraic targeting, point-slope form, slope-intercept form, and multi-line reasoning. The maser is fully operational. 🎯</p>
+        <div style={{background:'linear-gradient(135deg,#e8faf0,#d4f5e4)',border:'1.5px solid #a3e6be',borderRadius:20,padding:'28px 32px',textAlign:'left'}}>
+          <div style={{fontWeight:700,fontSize:16,color:'#1c5c35',marginBottom:14}}>Skills unlocked:</div>
+          {[
+            {icon:'📐','skill':'Slope from two points — Δy/Δx'},
+            {icon:'🔢','skill':'Slope-intercept form — y = mx + b'},
+            {icon:'📍','skill':'Point-slope form — y − y₁ = m(x − x₁)'},
+            {icon:'🤖','skill':'Algebraic precision targeting'},
+          ].map(({icon,skill},i)=><div key={i} style={{display:'flex',gap:10,alignItems:'center',marginBottom:10,fontSize:15,color:'#2d7a4b'}}>
+            <span style={{fontSize:20}}>{icon}</span><span>{skill}</span>
+          </div>)}
+        </div>
+      </div>
+    </div>);
+  }
+
+  const App=()=>{
+    const[done,setDone]=useState(new Set());
+    const[log,setLog]=useState({currentSection:'1.1',answersLog:[]});
+    const[nextReady,setNextReady]=useState(null); // index of next unlocked section
+    const[nextMsg,setNextMsg]=useState('');
+    const refs=useRef(ALL.map(()=>React.createRef()));
+    const complete=useCallback((id,idx,msg)=>{
+      setDone(p=>{const s=new Set(p);s.add(id);return s;});
+      const ni=idx+1,nid=ALL[ni]?.id;
+      if(nid){setLog(p=>({...p,currentSection:nid}));setNextReady(ni);setNextMsg(msg||'Keep going!');}
+    },[]);
+    const scrollToNext=useCallback(()=>{
+      if(nextReady==null)return;
+      refs.current[nextReady]?.current?.scrollIntoView({behavior:'smooth',block:'start'});
+      setNextReady(null);setNextMsg('');
+    },[nextReady]);
+    return(<div style={{background:'#fff',minHeight:'100vh'}}>
+      <div style={{textAlign:'center',padding:'52px 24px 8px',borderBottom:'1px solid #f2f2f7'}}>
+        <p style={{fontSize:13,fontWeight:600,color:'#aeaeb2',letterSpacing:'.1em',textTransform:'uppercase',margin:'0 0 8px'}}>Interactive</p>
+        <h1 className="serif" style={{fontSize:'clamp(28px,5vw,52px)',fontWeight:400,color:'#1c1c1e',margin:0,letterSpacing:'-.03em',lineHeight:1.1}}>Equations of Lines</h1>
+      </div>
+      <ProgBar done={done.size} total={ALL.length-1}/>
+      {nextReady!=null&&<button onClick={scrollToNext} aria-label="Scroll to next section"
+        style={{position:'fixed',bottom:32,left:'50%',transform:'translateX(-50%)',
+                zIndex:200,background:'#0a84ff',border:'none',borderRadius:32,
+                padding:'0 20px 0 16px',height:52,cursor:'pointer',display:'flex',
+                alignItems:'center',gap:10,
+                boxShadow:'0 4px 24px rgba(10,132,255,.5)',
+                animation:'arrowBounce 1.2s ease-in-out infinite',whiteSpace:'nowrap'}}>
+        <span style={{fontSize:15,fontWeight:600,color:'#fff',letterSpacing:'-.01em'}}>{nextMsg}</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>}
+      {ALL.map((s,i)=>{
+        const ref=refs.current[i];
+        const cp={key:s.id,sRef:ref,onDone:(msg)=>complete(s.id,i,msg),setLog};
+        if(!s.type||s.type==='game') return<GameSec {...cp} sec={s}/>;
+        if(s.type==='slope-explorer') return<SlopeExplorer {...cp}/>;
+        if(s.type==='kc')            return<KCSec {...cp} sec={s}/>;
+        if(s.type==='l2sub')         return<L2SubSec {...cp} subId={s.subId}/>;
+        if(s.type==='l3sub')         return<L3SubSec {...cp} subId={s.subId}/>;
+        if(s.type==='l3teach')       return<L3TeachSec {...cp}/>;
+        if(s.type==='l4final')       return<L4FinalSec {...cp}/>;
+        if(s.type==='done')          return<DoneSec key={s.id} sRef={ref}/>;
+        return null;
+      })}
+    </div>);
+  };
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
