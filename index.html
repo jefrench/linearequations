@@ -710,9 +710,9 @@ function beamBlocked(angle,b,obs){
     const[eggShown,setEggShown]=useState(false);
     useEffect(()=>{if(ok&&sec.maserEgg&&!eggShown)setEggShown(true);},[ok,sec.maserEgg,eggShown]);
     const Intro11=()=>(<p style={{color:'#636366',fontSize:15,lineHeight:1.6,margin:'0 auto',maxWidth:460}}>
-      An invasion of unbaked chocolate chip cookies has descended on the park. Your goal: bake them using your{' '}
+      An invasive species of unbaked chocolate chip cookies has descended on the park. Your goal: bake them using your{' '}
       <span style={{color:'#0a84ff',cursor:'pointer',textDecoration:'underline',textDecorationStyle:'dotted'}}
-            onClick={()=>setMaserOpen(o=>!o)}>microwave laser (maser)</span>
+            onClick={()=>setMaserOpen(o=>!o)}>maser (microwave "laser")</span>
       {' '}so they can become delicious treats. Click and drag the maser nozzle to aim, then deploy with the button below!
       {maserOpen&&<span className="fup" style={{display:'block',marginTop:10,padding:'10px 14px',background:'#f0f4ff',borderRadius:10,border:'1.5px solid #c7d2fe',fontSize:15,color:'#3a3a3c',lineHeight:1.6}}>
         <strong>Maser history:</strong> In 1953, Charles Townes at Columbia University built the first maser (Microwave Amplification by Stimulated Emission of Radiation). It uses quantum mechanics to amplify microwaves &mdash; the same principle later extended to visible light as the <em>laser</em>. Townes won the Nobel Prize in Physics in 1964. Today masers are used in atomic clocks, deep-space communication, and radio astronomy.{' '}
