@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <title>Cookie Invasion</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍪</text></svg>">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -285,7 +286,7 @@ function beamBlocked(angle,b,obs){
     </g>);
   }
 
-  function MaserSVG({angle,dragging,b=0}){
+  function MaserSVG({angle,dragging,b=0,showHandle=true}){
     const{x:bx,y:by}=m2s(0,b);
     const ex=bx+Math.cos(angle)*32,ey=by-Math.sin(angle)*32;
     // Drag handle sits far out along the beam — well away from the scissor lift zone
@@ -297,11 +298,13 @@ function beamBlocked(angle,b,obs){
       <circle cx={bx+10} cy={by} r="3" fill="#0a84ff" opacity=".78"/>
       <line x1={bx+10} y1={by} x2={ex} y2={ey} stroke="#636366" strokeWidth="4.5" strokeLinecap="round"/>
       <circle cx={ex} cy={ey} r="3.5" fill="#0a84ff" opacity=".88"/>
-      {/* Pulsing halo hint — pointer-events none so it doesn't intercept clicks */}
-      {!dragging&&<circle className="hpulse" cx={hx} cy={hy} r="20" fill="#0a84ff" style={{pointerEvents:'none'}}/>}
-      <circle cx={hx} cy={hy} r="6" fill="#0a84ff" opacity=".9"/>
-      <line x1={hx-5} y1={hy} x2={hx+5} y2={hy} stroke="white" strokeWidth="1.5" opacity=".8"/>
-      <line x1={hx}   y1={hy-5} x2={hx}   y2={hy+5} stroke="white" strokeWidth="1.5" opacity=".8"/>
+      {/* Drag handle — only shown when angle dragging is enabled */}
+      {showHandle&&<>
+        {!dragging&&<circle className="hpulse" cx={hx} cy={hy} r="20" fill="#0a84ff" style={{pointerEvents:'none'}}/>}
+        <circle cx={hx} cy={hy} r="6" fill="#0a84ff" opacity=".9"/>
+        <line x1={hx-5} y1={hy} x2={hx+5} y2={hy} stroke="white" strokeWidth="1.5" opacity=".8"/>
+        <line x1={hx}   y1={hy-5} x2={hx}   y2={hy+5} stroke="white" strokeWidth="1.5" opacity=".8"/>
+      </>}
       <text x={bx-8} y={by+28} fontSize="9" fill="#aeaeb2" fontFamily="monospace">{b>0?'(0,'+Math.round(b)+')':'(0,0)'}</text>
     </g>);
   }
@@ -374,7 +377,7 @@ function beamBlocked(angle,b,obs){
     </g>);
   }
 
-  function ScissorLift({b,ld}){
+  function ScissorLift({b,ld,showDragHandle=true}){
     // Always visible. 6 scissor diamonds stacked vertically.
     // At b=0 they are squished flat; as b grows they expand to show the classic X pattern.
     const N=6; // total scissors
@@ -413,8 +416,8 @@ function beamBlocked(angle,b,obs){
       <rect x={lx-8} y={topY-5} width={liftW+16} height={8} rx="3" fill={COL2}/>
       {/* b= label */}
       <text x={lx-8} y={topY+4} textAnchor="end" fontSize="9" fill="#f97316" fontFamily="monospace" fontWeight="600">{'b='+Math.round(b)}</text>
-      {/* Glowing drag handle on the platform */}
-      <g style={{animation:'liftGlow 1.6s ease-in-out infinite',cursor:'grab'}}>
+      {/* Glowing drag handle on the platform — hidden when lift drag is disabled */}
+      {showDragHandle&&<g style={{animation:'liftGlow 1.6s ease-in-out infinite',cursor:'grab'}}>
         <rect x={lx+2} y={topY-19} width={liftW+4} height={22} rx="8"
               fill={ld?'rgba(249,115,22,.55)':'rgba(249,115,22,.28)'}
               stroke={COL} strokeWidth={ld?2.5:2}/>
@@ -423,7 +426,7 @@ function beamBlocked(angle,b,obs){
                 stroke={ld?'#fff':'#fdba74'} strokeWidth="1.8" strokeLinecap="round" opacity=".9"/>
         ))}
         <text x={rx+8} y={topY-4} fontSize="11" fill="#fdba74" fontWeight="700" opacity=".85">&#x2195;</text>
-      </g>
+      </g>}
     </g>);
   }
 
@@ -1579,9 +1582,9 @@ function beamBlocked(angle,b,obs){
         {showY&&b>0&&<line className="yline" x1={OX} y1={OY} x2={OX} y2={OY-b} stroke="#0a84ff" strokeWidth="5" strokeLinecap="round"/>}
         {b>1&&<text x={OX+8} y={OY-b-6} fontSize="10" fill="#0a84ff" fontFamily="monospace" fontWeight="600">{'b='+Math.round(b)}</text>}
         {obs.map((o,i)=><ParkBench key={i} {...o} blocked={blocked}/>)}
-        <ScissorLift b={b} ld={dl}/>
+        <ScissorLift b={b} ld={dl} showDragHandle={liftDrag}/>
         <line x1={orig.x} y1={orig.y} x2={ep.x} y2={ep.y} stroke="#0a84ff" strokeWidth="1.5" strokeDasharray="5 7" opacity=".55" style={{pointerEvents:'none'}}/>
-        <MaserSVG angle={angle} dragging={false} b={b}/>
+        <MaserSVG angle={angle} dragging={false} b={b} showHandle={false}/>
         {fired&&<line className="beam-line" x1={orig.x} y1={orig.y} x2={fe.x} y2={fe.y}
                       stroke={blocked?'#ff9f0a':'#0a84ff'} strokeWidth="2.5" strokeLinecap="round" style={{pointerEvents:'none'}}/>}
         {cookies.map(c=><CookieSVG key={c.id} mx={c.mx} my={c.my} baked={baked.has(c.id)} pop={hits.has(c.id)} showId={cookies.length>1} cid={'l3'+c.id}/>)}
@@ -1592,21 +1595,6 @@ function beamBlocked(angle,b,obs){
     </div>);
   }
 
-// Parse point-slope: y − y1 = m(x − x1) OR y - y1 = mx. Returns {m, b, x1, y1} or null.
-  function parsePointSlope(s){
-    const t=s.replace(/\s/g,'').toLowerCase();
-    // Updated Regex: makes the parentheses and the x-offset optional so "0.5x" works
-    const re=/^y([+-]\d+(?:\.\d+)?(?:\/\d+(?:\.\d+)?)?)?=([+-]?(?:\d+(?:\.\d+)?(?:\/\d+(?:\.\d+)?)?))(?:x|\(x([+-]\d+(?:\.\d+)?(?:\/\d+(?:\.\d+)?)?)?\))$/;
-    const m2=t.match(re);
-    if(!m2)return null;
-    const parseFrac=v=>{if(!v)return 0;if(v.includes('/')){const[n,d]=v.split('/');return parseFloat(n)/parseFloat(d);}return parseFloat(v);};
-    const y1=-parseFrac(m2[1]);   // sign flipped: "y-20" → group is "-20" → y1=20
-    const mNum=parseFrac(m2[2]);
-    const x1=-parseFrac(m2[3]);   // If they typed "0.5x", m2[3] is undefined, which parses to 0. Perfect!
-    if(isNaN(mNum))return null;
-    const b=y1-mNum*x1;
-    return{m:mNum,b,x1,y1};
-  }
 
   // ── L3SubSec ────────────────────────────────────────────────────
   function L3SubSec({subId,sRef,onDone,setLog}){
@@ -1617,8 +1605,11 @@ function beamBlocked(angle,b,obs){
     const[bInput,setBInput]=useState(null);  // numeric b for slopeintercept
     const[dyInput,setDyInput]=useState('');  // scaffolded Δy entry
     const[dxInput,setDxInput]=useState('');  // scaffolded Δx entry
-    const[psInput,setPsInput]=useState('');  // point-slope string
+    const[psY1,setPsY1]=useState('');    // box 1: y₁
+    const[psM,setPsM]=useState('');     // box 2: m
+    const[psX1,setPsX1]=useState('');   // box 3: x₁
     const[psErr,setPsErr]=useState('');
+    const[psFeedback,setPsFeedback]=useState('');
     const[fired,setFired]=useState(false);
     const[baked,setBaked]=useState(new Set());
     const[hits,setHits]=useState(new Set());
@@ -1663,23 +1654,56 @@ function beamBlocked(angle,b,obs){
       setAgMsg('Computed m = '+dy+'/'+dx+' = '+m.toFixed(4)+'. Angle set! Now adjust the lift and fire.');
     };
 
-    // Point-slope parse + apply
+    // 3-box point-slope grader
+    const parseFracBox=raw=>{
+      const t=(raw||'').trim();
+      if(t==='')return null;
+      if(t.includes('/')){
+        const parts=t.split('/');
+        if(parts.length!==2)return null;
+        const n=parseFloat(parts[0]),d=parseFloat(parts[1]);
+        if(isNaN(n)||isNaN(d)||d===0)return null;
+        return n/d;
+      }
+      const v=parseFloat(t);
+      return isNaN(v)?null:v;
+    };
     const applyPointSlope=()=>{
-      const res=parsePointSlope(psInput);
-      if(!res){setPsErr("Can't parse — try: y−20 = 0.5(x−0) or y−170 = 0.5(x−300)");return;}
-      // Validate: (x1,y1) must be one of the two cookies (within rounding tolerance)
-      const TOL=1.5;
-      const matchesCookie=data.cookies.some(c=>Math.abs(c.mx-res.x1)<TOL&&Math.abs(c.my-res.y1)<TOL);
-      if(!matchesCookie){
-        const opts=data.cookies.map(c=>`(${c.mx},${c.my})`).join(' or ');
-        setPsErr(`(${res.x1},${res.y1}) isn't one of the cookies. Use ${opts} as your (x₁,y₁).`);
+      setPsErr('');setPsFeedback('');
+      const y1v=parseFracBox(psY1),mv=parseFracBox(psM),x1v=parseFracBox(psX1);
+      if(y1v===null||mv===null||x1v===null){
+        setPsErr('Fill in all three boxes. You can use decimals or fractions like 1/2.');
         return;
       }
-      setPsErr('');
-      setAngle(Math.atan(res.m));setMInput(res.m);
-      setB(Math.max(0,Math.min(300,res.b)));setBInput(res.b);
-      setAgMsg('Parsed! m = '+res.m.toFixed(3)+', b = '+res.b.toFixed(1)+'. Hit Deploy to fire.');
-      resetIdle();
+      // Grade: plug both known points (0,20) and (300,170) into (y − y₁) = m(x − x₁)
+      const EPS=1e-5;
+      const check1=Math.abs((20 -y1v)-mv*(0  -x1v))<EPS;
+      const check2=Math.abs((170-y1v)-mv*(300-x1v))<EPS;
+      if(check1&&check2){
+        // Correct equation — check it uses an actual cookie coordinate as the anchor point
+        const usedA=Math.abs(x1v-0)<EPS  &&Math.abs(y1v-20 )<EPS;
+        const usedB=Math.abs(x1v-300)<EPS&&Math.abs(y1v-170)<EPS;
+        if(!usedA&&!usedB){
+          setPsFeedback('✓ Your equation describes the correct line — nice algebra! But point-slope form asks you to use one of the cookie coordinates as (x₁, y₁). Try (0, 20) or (300, 170).');
+          return;
+        }
+        // Fully correct — set cannon and confirm
+        const bVal=y1v-mv*x1v;
+        setAngle(Math.atan(mv));setMInput(mv);
+        setB(Math.max(0,Math.min(300,bVal)));setBInput(bVal);
+        setAgMsg('Point-slope confirmed ✓  m = '+mv+', b = '+bVal.toFixed(1)+'. Hit Deploy to fire!');
+        resetIdle();
+      } else {
+        // Wrong — targeted feedback
+        if(mv<0){
+          setPsErr('Your slope m is negative, but this line rises from left to right — m should be positive. Check your rise ÷ run.');
+        } else if(Math.abs(mv-0.5)<EPS){
+          // Slope right but wrong point
+          setPsErr('Your slope looks right! But the point ('+psX1+', '+psY1+') doesn\'t sit on this line. Use a cookie coordinate: (0, 20) or (300, 170).');
+        } else {
+          setPsErr('That doesn\'t satisfy both cookie coordinates. Verify that (y − y₁) = m(x − x₁) holds for both (0, 20) and (300, 170).');
+        }
+      }
     };
 
     const ha=useCallback(a=>{
@@ -1802,28 +1826,43 @@ function beamBlocked(angle,b,obs){
         {/* MODE: point-slope */}
         {data.mode==='pointslope'&&<div className="wcard" style={{width:'100%',padding:'18px 22px'}}>
           <div style={{fontSize:13,fontWeight:600,color:'#636366',letterSpacing:'.06em',marginBottom:10}}>ENTER POINT-SLOPE EQUATION</div>
-          <div style={{background:'#f0f4ff',borderRadius:10,padding:'10px 14px',marginBottom:12,fontFamily:'monospace',fontSize:14,color:'#3a3a3c'}}>
+          <div style={{background:'#f0f4ff',borderRadius:10,padding:'10px 14px',marginBottom:14,fontFamily:'monospace',fontSize:14,color:'#3a3a3c'}}>
             Cookies: ({data.cookies[0].mx},{data.cookies[0].my}) &amp; ({data.cookies[1].mx},{data.cookies[1].my})
+            &nbsp;·&nbsp; Use either as your (x₁, y₁)
           </div>
-          <div style={{fontSize:14,color:'#3a3a3c',marginBottom:8,lineHeight:1.6}}>
-            Use <strong>either</strong> cookie as (x₁,&nbsp;y₁). Both give the same line:
-            <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:6}}>
-              {data.cookies.map(c=><span key={c.id} style={{fontFamily:'monospace',fontSize:13,background:'#f0f4ff',borderRadius:6,padding:'3px 8px',color:'#4338ca'}}>
-                y−{c.my} = m(x−{c.mx})
-              </span>)}
-            </div>
+          {/* Inline equation: y − [box1] = [box2] ( x − [box3] ) */}
+          <div style={{display:'flex',alignItems:'center',gap:5,flexWrap:'wrap',fontSize:19,color:'#1c1c1e',marginBottom:10,fontFamily:'Georgia,serif'}}>
+            <span style={{fontStyle:'italic'}}>y</span>
+            <span>−</span>
+            <input value={psY1} onChange={e=>{setPsY1(e.target.value);setPsErr('');setPsFeedback('');}}
+                   onKeyDown={e=>e.key==='Enter'&&applyPointSlope()}
+                   placeholder="y₁" aria-label="y₁"
+                   style={{width:60,border:'2px solid '+(psErr?'#ff3b30':'#c7d2fe'),borderRadius:8,
+                           padding:'5px 7px',fontSize:16,fontFamily:'monospace',outline:'none',
+                           textAlign:'center',background:'#fafbff'}}/>
+            <span>=</span>
+            <input value={psM} onChange={e=>{setPsM(e.target.value);setPsErr('');setPsFeedback('');}}
+                   onKeyDown={e=>e.key==='Enter'&&applyPointSlope()}
+                   placeholder="m" aria-label="m"
+                   style={{width:60,border:'2px solid '+(psErr?'#ff3b30':'#c7d2fe'),borderRadius:8,
+                           padding:'5px 7px',fontSize:16,fontFamily:'monospace',outline:'none',
+                           textAlign:'center',background:'#fafbff'}}/>
+            <span style={{fontSize:18}}>(</span>
+            <span style={{fontStyle:'italic'}}>x</span>
+            <span>−</span>
+            <input value={psX1} onChange={e=>{setPsX1(e.target.value);setPsErr('');setPsFeedback('');}}
+                   onKeyDown={e=>e.key==='Enter'&&applyPointSlope()}
+                   placeholder="x₁" aria-label="x₁"
+                   style={{width:60,border:'2px solid '+(psErr?'#ff3b30':'#c7d2fe'),borderRadius:8,
+                           padding:'5px 7px',fontSize:16,fontFamily:'monospace',outline:'none',
+                           textAlign:'center',background:'#fafbff'}}/>
+            <span>)</span>
+            <button className="nbtn" onClick={applyPointSlope}
+                    style={{padding:'7px 18px',fontSize:15,marginLeft:6}}>Check ✓</button>
           </div>
-          <div style={{display:'flex',gap:8,alignItems:'flex-start',flexWrap:'wrap'}}>
-            <div style={{flex:1,minWidth:220}}>
-              <input value={psInput} onChange={e=>{setPsInput(e.target.value);setPsErr('');}}
-                     onKeyDown={e=>e.key==='Enter'&&applyPointSlope()}
-                     placeholder={`e.g. y−${data.cookies[0].my}=m(x−${data.cookies[0].mx}) or y−${data.cookies[1]?.my}=m(x−${data.cookies[1]?.mx})`}
-                     style={{width:'100%',border:'1.5px solid '+(psErr?'#ff3b30':'#d1d1d6'),borderRadius:10,padding:'11px 14px',fontSize:15,fontFamily:'monospace',outline:'none',boxSizing:'border-box'}}/>
-              {psErr&&<p style={{fontSize:13,color:'#ff3b30',margin:'4px 0 0'}}>{psErr}</p>}
-            </div>
-            <button className="nbtn" onClick={applyPointSlope} style={{padding:'11px 20px',fontSize:15,flexShrink:0}}>Parse &rarr;</button>
-          </div>
-          <p style={{fontSize:13,color:'#aeaeb2',marginTop:8}}>After parsing, Deploy to fire.</p>
+          {psErr&&<p style={{fontSize:13,color:'#ff3b30',margin:'0 0 6px',lineHeight:1.5}}>{psErr}</p>}
+          {psFeedback&&<p style={{fontSize:13,color:'#0a84ff',margin:'0 0 6px',lineHeight:1.5}}>{psFeedback}</p>}
+          <p style={{fontSize:12,color:'#aeaeb2',margin:0}}>Type decimals or fractions (e.g. 1/2). After a correct check, hit Deploy to fire.</p>
         </div>}
 
         {/* MODE: slope-intercept */}
